@@ -153,17 +153,6 @@ resource "aws_launch_template" "node_group" {
 
   vpc_security_group_ids = [aws_security_group.node_group.id]
 
-  # User data для додаткових налаштувань
-  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    cluster_name            = var.cluster_name
-    cluster_endpoint        = aws_eks_cluster.main.endpoint
-    cluster_ca              = aws_eks_cluster.main.certificate_authority[0].data
-    bootstrap_arguments     = var.node_groups[count.index].bootstrap_extra_args
-    enable_cloudwatch_agent = false
-    install_docker          = false
-    ssh_public_key          = ""
-  }))
-
   # Налаштування блокових пристроїв
   dynamic "block_device_mappings" {
     for_each = var.node_groups[count.index].disk_size > 0 ? [1] : []

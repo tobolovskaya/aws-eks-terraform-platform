@@ -111,7 +111,7 @@ db_password = "your-secure-password"
 
 # EKS налаштування
 eks_cluster_name = "my-cluster"
-kubernetes_version = "1.28"
+kubernetes_version = "1.35"
 
 # Jenkins налаштування
 jenkins_admin_password = "secure-password"
@@ -462,7 +462,7 @@ module "eks" {
   
   # Основні параметри
   cluster_name       = "production-cluster"
-  kubernetes_version = "1.28"
+  kubernetes_version = "1.35"
   
   # Мережа
   vpc_id     = module.vpc.vpc_id
@@ -483,7 +483,6 @@ module "eks" {
         NodeGroup   = "main"
       }
       taints = []
-      bootstrap_extra_args = ""
     },
     {
       name           = "spot"
@@ -505,7 +504,6 @@ module "eks" {
           effect = "NO_SCHEDULE"
         }
       ]
-      bootstrap_extra_args = "--container-runtime containerd"
     }
   ]
   
@@ -671,7 +669,7 @@ module "mysql_rds" {
 | Змінна | Тип | За замовчуванням | Опис |
 |--------|-----|------------------|------|
 | `eks_cluster_name` | `string` | `"my-eks-cluster"` | Назва EKS кластера |
-| `kubernetes_version` | `string` | `"1.28"` | Версія Kubernetes |
+| `kubernetes_version` | `string` | `"1.35"` | Версія Kubernetes |
 | `node_groups` | `list(object)` | `[...]` | Конфігурація node groups |
 
 ### ECR параметри
