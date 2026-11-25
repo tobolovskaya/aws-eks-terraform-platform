@@ -186,8 +186,13 @@ module "jenkins" {
   install_plugins = var.jenkins_install_plugins
 
   # AWS інтеграція
-  aws_region       = var.aws_region
-  ecr_registry_url = module.ecr.repository_url
+  aws_region         = var.aws_region
+  ecr_registry_url   = module.ecr.repository_url
+  ecr_repository_arn = module.ecr.repository_arn
+
+  # IRSA for build agents
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.cluster_oidc_issuer_url
 
   # Auto Scaling
   enable_hpa                    = var.jenkins_enable_hpa

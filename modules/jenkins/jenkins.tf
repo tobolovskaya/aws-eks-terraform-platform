@@ -183,6 +183,17 @@ resource "helm_release" "jenkins" {
     value = kubernetes_service_account.jenkins.metadata[0].name
   }
 
+  # Build agents get AWS access only through their own IRSA role
+  set {
+    name  = "serviceAccountAgent.name"
+    value = var.agent_service_account_name
+  }
+
+  set {
+    name  = "serviceAccountAgent.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = aws_iam_role.jenkins_agent.arn
+  }
+
   set {
     name  = "persistence.enabled"
     value = var.persistence_enabled

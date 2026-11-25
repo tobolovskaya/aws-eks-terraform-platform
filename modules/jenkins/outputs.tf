@@ -254,3 +254,7 @@ output "troubleshooting_commands" {
     helm_history  = "helm history ${helm_release.jenkins.name} -n ${kubernetes_namespace.jenkins.metadata[0].name}"
   }
 }
+output "agent_role_arn" {
+  description = "IAM role (IRSA) for Jenkins build agents"
+  value       = aws_iam_role.jenkins_agent.arn
+}
