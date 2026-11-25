@@ -411,3 +411,24 @@ variable "agent_connection_timeout" {
     error_message = "Timeout підключення агентів повинен бути від 30 до 300 секунд."
   }
 }
+# IRSA for Jenkins build agents
+variable "oidc_provider_arn" {
+  description = "ARN of the EKS cluster OIDC provider (module.eks.oidc_provider_arn)"
+  type        = string
+}
+
+variable "oidc_provider_url" {
+  description = "OIDC issuer URL of the EKS cluster (module.eks.cluster_oidc_issuer_url)"
+  type        = string
+}
+
+variable "ecr_repository_arn" {
+  description = "ARN of the only ECR repository Jenkins agents may push to"
+  type        = string
+}
+
+variable "agent_service_account_name" {
+  description = "Kubernetes service account used by Jenkins build agents"
+  type        = string
+  default     = "jenkins-agent"
+}
