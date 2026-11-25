@@ -139,11 +139,8 @@ resource "aws_iam_role_policy_attachment" "node_group_AmazonEC2ContainerRegistry
   role       = aws_iam_role.node_group.name
 }
 
-# Додаткова політика для EBS CSI Driver
-resource "aws_iam_role_policy_attachment" "node_group_AmazonEBSCSIDriverPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-  role       = aws_iam_role.node_group.name
-}
+# EBS CSI Driver gets its own IAM role via IRSA (aws_ebs_csi_driver.tf),
+# so the node role does not need AmazonEBSCSIDriverPolicy (least privilege).
 
 # Launch template для node groups
 resource "aws_launch_template" "node_group" {
@@ -171,7 +168,7 @@ resource "aws_launch_template" "node_group" {
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required"
-    http_put_response_hop_limit = 2
+    http_put_response_hop_limit = 1 # pods cannot reach IMDS and steal node credentials
   }
 
   tags = var.tags
@@ -287,7 +284,6 @@ resource "aws_eks_node_group" "main" {
     aws_iam_role_policy_attachment.node_group_AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_group_AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_group_AmazonEC2ContainerRegistryReadOnly,
-    aws_iam_role_policy_attachment.node_group_AmazonEBSCSIDriverPolicy,
   ]
 
   lifecycle {
