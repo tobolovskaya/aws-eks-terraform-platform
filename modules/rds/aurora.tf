@@ -13,7 +13,7 @@ resource "aws_rds_cluster" "main" {
   database_name   = var.database_name
   master_username = var.username
   master_password = var.password
-  port           = local.default_port
+  port            = local.default_port
 
   # Мережа та безпека
   db_subnet_group_name   = aws_db_subnet_group.main.name
@@ -23,14 +23,14 @@ resource "aws_rds_cluster" "main" {
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.main[0].name
 
   # Бекапи та обслуговування
-  backup_retention_period = var.backup_retention_period
-  preferred_backup_window = var.backup_window
+  backup_retention_period      = var.backup_retention_period
+  preferred_backup_window      = var.backup_window
   preferred_maintenance_window = var.maintenance_window
-  skip_final_snapshot = var.skip_final_snapshot
-  final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.tags.Project}-aurora-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
+  skip_final_snapshot          = var.skip_final_snapshot
+  final_snapshot_identifier    = var.skip_final_snapshot ? null : "${var.tags.Project}-aurora-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
 
   # Захист
-  deletion_protection = var.deletion_protection
+  deletion_protection   = var.deletion_protection
   copy_tags_to_snapshot = true
 
   # Шифрування
@@ -80,7 +80,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   monitoring_interval = var.monitoring_interval
   monitoring_role_arn = var.monitoring_interval > 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
 
-  performance_insights_enabled = var.performance_insights_enabled
+  performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_enabled ? 7 : null
 
   # Автоматичні оновлення

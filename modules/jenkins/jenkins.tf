@@ -5,8 +5,8 @@ resource "kubernetes_namespace" "jenkins" {
   metadata {
     name = var.namespace
     labels = {
-      name = var.namespace
-      "app.kubernetes.io/name" = "jenkins"
+      name                         = var.namespace
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
@@ -34,20 +34,20 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
     name      = "jenkins-home-pvc"
     namespace = kubernetes_namespace.jenkins.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
 
   spec {
     access_modes = ["ReadWriteOnce"]
-    
+
     resources {
       requests = {
         storage = var.storage_size
       }
     }
-    
+
     storage_class_name = var.storage_class
   }
 
@@ -60,7 +60,7 @@ resource "kubernetes_service_account" "jenkins" {
     name      = "jenkins-serviceaccount"
     namespace = kubernetes_namespace.jenkins.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
@@ -73,7 +73,7 @@ resource "kubernetes_cluster_role" "jenkins" {
   metadata {
     name = "jenkins-clusterrole"
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
@@ -114,7 +114,7 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
   metadata {
     name = "jenkins-clusterrolebinding"
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
@@ -140,7 +140,7 @@ resource "kubernetes_config_map" "jenkins_config" {
     name      = "jenkins-config"
     namespace = kubernetes_namespace.jenkins.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
@@ -311,7 +311,7 @@ resource "kubernetes_service" "jenkins_lb" {
     name      = "${var.release_name}-loadbalancer"
     namespace = kubernetes_namespace.jenkins.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
     annotations = var.load_balancer_annotations
@@ -319,7 +319,7 @@ resource "kubernetes_service" "jenkins_lb" {
 
   spec {
     type = "LoadBalancer"
-    
+
     port {
       name        = "http"
       port        = 80
@@ -344,13 +344,13 @@ resource "kubernetes_ingress_v1" "jenkins" {
     name      = "${var.release_name}-ingress"
     namespace = kubernetes_namespace.jenkins.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
     annotations = merge(
       {
-        "kubernetes.io/ingress.class" = var.ingress_class_name
-        "nginx.ingress.kubernetes.io/proxy-body-size" = "50m"
+        "kubernetes.io/ingress.class"                         = var.ingress_class_name
+        "nginx.ingress.kubernetes.io/proxy-body-size"         = "50m"
         "nginx.ingress.kubernetes.io/proxy-request-buffering" = "off"
       },
       var.ingress_annotations
@@ -368,12 +368,12 @@ resource "kubernetes_ingress_v1" "jenkins" {
 
     rule {
       host = var.ingress_hostname
-      
+
       http {
         path {
           path      = "/"
           path_type = "Prefix"
-          
+
           backend {
             service {
               name = "${var.release_name}-jenkins"
@@ -396,7 +396,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "jenkins" {
     name      = "${var.release_name}-hpa"
     namespace = kubernetes_namespace.jenkins.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "jenkins"
+      "app.kubernetes.io/name"     = "jenkins"
       "app.kubernetes.io/instance" = var.release_name
     }
   }

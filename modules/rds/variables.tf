@@ -11,7 +11,7 @@ variable "engine" {
   description = "Движок бази даних (postgres, mysql, mariadb)"
   type        = string
   default     = "postgres"
-  
+
   validation {
     condition = contains([
       "postgres", "mysql", "mariadb",
@@ -127,7 +127,7 @@ variable "backup_retention_period" {
   description = "Період зберігання бекапів в днях"
   type        = number
   default     = 7
-  
+
   validation {
     condition     = var.backup_retention_period >= 0 && var.backup_retention_period <= 35
     error_message = "Період зберігання бекапів повинен бути від 0 до 35 днів."
@@ -163,9 +163,9 @@ variable "monitoring_interval" {
   description = "Інтервал моніторингу в секундах (0, 1, 5, 10, 15, 30, 60)"
   type        = number
   default     = 60
-  
+
   validation {
-    condition = contains([0, 1, 5, 10, 15, 30, 60], var.monitoring_interval)
+    condition     = contains([0, 1, 5, 10, 15, 30, 60], var.monitoring_interval)
     error_message = "Інтервал моніторингу повинен бути одним з: 0, 1, 5, 10, 15, 30, 60."
   }
 }
@@ -187,7 +187,7 @@ variable "aurora_cluster_instances" {
   description = "Кількість інстансів в Aurora кластері"
   type        = number
   default     = 2
-  
+
   validation {
     condition     = var.aurora_cluster_instances >= 1 && var.aurora_cluster_instances <= 15
     error_message = "Кількість інстансів повинна бути від 1 до 15."

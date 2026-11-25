@@ -97,10 +97,10 @@ locals {
   # CloudWatch logs для різних движків
   default_logs_exports = {
     postgres          = ["postgresql"]
-    mysql            = ["error", "general", "slow-query"]
-    mariadb          = ["error", "general", "slow-query"]
+    mysql             = ["error", "general", "slow-query"]
+    mariadb           = ["error", "general", "slow-query"]
     aurora-postgresql = ["postgresql"]
-    aurora-mysql     = ["error", "general", "slow-query"]
+    aurora-mysql      = ["error", "general", "slow-query"]
   }
 
   logs_exports = length(var.enabled_cloudwatch_logs_exports) > 0 ? var.enabled_cloudwatch_logs_exports : lookup(local.default_logs_exports, local.aurora_engine, [])
@@ -136,10 +136,10 @@ resource "aws_security_group" "db" {
   dynamic "ingress" {
     for_each = var.allowed_security_groups
     content {
-      from_port                = local.default_port
-      to_port                  = local.default_port
-      protocol                 = "tcp"
-      source_security_group_id = ingress.value
+      from_port       = local.default_port
+      to_port         = local.default_port
+      protocol        = "tcp"
+      security_groups = [ingress.value]
     }
   }
 
@@ -164,10 +164,10 @@ resource "aws_security_group" "db" {
 resource "aws_db_parameter_group" "main" {
   count = var.use_aurora ? 0 : 1
 
-  family = local.aurora_engine == "postgres" ? "postgres15" :
-           local.aurora_engine == "mysql" ? "mysql8.0" :
-           local.aurora_engine == "mariadb" ? "mariadb10.11" :
-           "postgres15"
+  family = (local.aurora_engine == "postgres" ? "postgres15" :
+    local.aurora_engine == "mysql" ? "mysql8.0" :
+    local.aurora_engine == "mariadb" ? "mariadb10.11" :
+  "postgres15")
 
   name = "${var.tags.Project}-db-params"
 
@@ -193,9 +193,9 @@ resource "aws_db_parameter_group" "main" {
 resource "aws_rds_cluster_parameter_group" "main" {
   count = var.use_aurora ? 1 : 0
 
-  family = local.aurora_engine == "aurora-postgresql" ? "aurora-postgresql15" :
-           local.aurora_engine == "aurora-mysql" ? "aurora-mysql8.0" :
-           "aurora-postgresql15"
+  family = (local.aurora_engine == "aurora-postgresql" ? "aurora-postgresql15" :
+    local.aurora_engine == "aurora-mysql" ? "aurora-mysql8.0" :
+  "aurora-postgresql15")
 
   name = "${var.tags.Project}-cluster-params"
 

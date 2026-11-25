@@ -18,31 +18,31 @@ provider "aws" {
 
 # Модуль для створення S3 backend
 module "s3_backend" {
-  source = "./modules/s3-backend"
-  
+  source = "../modules/s3-backend"
+
   # Основні параметри
-  bucket_name          = var.backend_bucket_name
-  dynamodb_table_name  = var.backend_dynamodb_table_name
-  environment          = var.environment
-  
+  bucket_name         = var.backend_bucket_name
+  dynamodb_table_name = var.backend_dynamodb_table_name
+  environment         = var.environment
+
   # S3 налаштування
-  state_retention_days   = var.state_retention_days
-  enable_access_logging  = var.enable_access_logging
-  
+  state_retention_days  = var.state_retention_days
+  enable_access_logging = var.enable_access_logging
+
   # DynamoDB налаштування
-  dynamodb_billing_mode                    = var.dynamodb_billing_mode
-  dynamodb_read_capacity                   = var.dynamodb_read_capacity
-  dynamodb_write_capacity                  = var.dynamodb_write_capacity
+  dynamodb_billing_mode                   = var.dynamodb_billing_mode
+  dynamodb_read_capacity                  = var.dynamodb_read_capacity
+  dynamodb_write_capacity                 = var.dynamodb_write_capacity
   enable_point_in_time_recovery           = var.enable_point_in_time_recovery
   enable_dynamodb_autoscaling             = var.enable_dynamodb_autoscaling
   dynamodb_autoscaling_read_max_capacity  = var.dynamodb_autoscaling_read_max_capacity
   dynamodb_autoscaling_write_max_capacity = var.dynamodb_autoscaling_write_max_capacity
   dynamodb_autoscaling_target_value       = var.dynamodb_autoscaling_target_value
-  
+
   # Моніторинг
   enable_cloudwatch_alarms = var.enable_cloudwatch_alarms
-  sns_topic_arn           = var.sns_topic_arn
-  
+  sns_topic_arn            = var.sns_topic_arn
+
   # Теги
   tags = var.backend_tags
 }

@@ -153,15 +153,18 @@ resource "aws_launch_template" "node_group" {
   count = length(var.node_groups)
 
   name_prefix = "${var.cluster_name}-${var.node_groups[count.index].name}-"
-  
+
   vpc_security_group_ids = [aws_security_group.node_group.id]
 
   # User data для додаткових налаштувань
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    cluster_name        = var.cluster_name
-    cluster_endpoint    = aws_eks_cluster.main.endpoint
-    cluster_ca          = aws_eks_cluster.main.certificate_authority[0].data
-    bootstrap_arguments = var.node_groups[count.index].bootstrap_extra_args
+    cluster_name            = var.cluster_name
+    cluster_endpoint        = aws_eks_cluster.main.endpoint
+    cluster_ca              = aws_eks_cluster.main.certificate_authority[0].data
+    bootstrap_arguments     = var.node_groups[count.index].bootstrap_extra_args
+    enable_cloudwatch_agent = false
+    install_docker          = false
+    ssh_public_key          = ""
   }))
 
   # Налаштування блокових пристроїв

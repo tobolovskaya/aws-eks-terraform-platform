@@ -93,7 +93,7 @@ output "repository_creation_time" {
 # Інформація для Kubernetes
 output "kubernetes_image_pull_secret" {
   description = "Команда для створення Kubernetes secret для ECR"
-  value = "kubectl create secret docker-registry ecr-secret --docker-server=${aws_ecr_repository.main.repository_url} --docker-username=AWS --docker-password=$(aws ecr get-login-password --region ${data.aws_region.current.name})"
+  value       = "kubectl create secret docker-registry ecr-secret --docker-server=${aws_ecr_repository.main.repository_url} --docker-username=AWS --docker-password=$(aws ecr get-login-password --region ${data.aws_region.current.name})"
 }
 
 # Helm values для використання в чартах

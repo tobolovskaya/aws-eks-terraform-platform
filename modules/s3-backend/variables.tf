@@ -4,7 +4,7 @@
 variable "bucket_name" {
   description = "Назва S3 бакета для зберігання стану Terraform"
   type        = string
-  
+
   validation {
     condition     = can(regex("^[a-z0-9][a-z0-9-]*[a-z0-9]$", var.bucket_name))
     error_message = "Назва бакета повинна містити тільки малі літери, цифри та дефіси, починатися та закінчуватися літерою або цифрою."
@@ -21,7 +21,7 @@ variable "environment" {
   description = "Середовище (dev, staging, prod)"
   type        = string
   default     = "dev"
-  
+
   validation {
     condition     = contains(["dev", "staging", "prod"], var.environment)
     error_message = "Environment повинен бути одним з: dev, staging, prod."
@@ -33,7 +33,7 @@ variable "state_retention_days" {
   description = "Кількість днів для зберігання старих версій стану"
   type        = number
   default     = 90
-  
+
   validation {
     condition     = var.state_retention_days >= 1 && var.state_retention_days <= 365
     error_message = "Період зберігання повинен бути від 1 до 365 днів."
@@ -51,7 +51,7 @@ variable "dynamodb_billing_mode" {
   description = "Режим біллінгу для DynamoDB (PAY_PER_REQUEST або PROVISIONED)"
   type        = string
   default     = "PAY_PER_REQUEST"
-  
+
   validation {
     condition     = contains(["PAY_PER_REQUEST", "PROVISIONED"], var.dynamodb_billing_mode)
     error_message = "Billing mode повинен бути PAY_PER_REQUEST або PROVISIONED."
@@ -62,7 +62,7 @@ variable "dynamodb_read_capacity" {
   description = "Read capacity units для DynamoDB (тільки для PROVISIONED режиму)"
   type        = number
   default     = 5
-  
+
   validation {
     condition     = var.dynamodb_read_capacity >= 1
     error_message = "Read capacity повинен бути мінімум 1."
@@ -73,7 +73,7 @@ variable "dynamodb_write_capacity" {
   description = "Write capacity units для DynamoDB (тільки для PROVISIONED режиму)"
   type        = number
   default     = 5
-  
+
   validation {
     condition     = var.dynamodb_write_capacity >= 1
     error_message = "Write capacity повинен бути мінімум 1."
@@ -109,7 +109,7 @@ variable "dynamodb_autoscaling_target_value" {
   description = "Цільове значення утилізації для автоскейлінгу (%)"
   type        = number
   default     = 70
-  
+
   validation {
     condition     = var.dynamodb_autoscaling_target_value >= 10 && var.dynamodb_autoscaling_target_value <= 90
     error_message = "Цільове значення повинно бути від 10% до 90%."

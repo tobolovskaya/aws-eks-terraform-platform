@@ -27,35 +27,35 @@ resource "aws_db_instance" "main" {
   publicly_accessible    = var.publicly_accessible
 
   # Доступність
-  multi_az               = var.multi_az
-  availability_zone      = var.multi_az ? null : data.aws_availability_zones.available.names[0]
+  multi_az          = var.multi_az
+  availability_zone = var.multi_az ? null : data.aws_availability_zones.available.names[0]
 
   # Параметри
   parameter_group_name = aws_db_parameter_group.main[0].name
 
   # Бекапи та обслуговування
-  backup_retention_period = var.backup_retention_period
-  backup_window          = var.backup_window
-  maintenance_window     = var.maintenance_window
-  skip_final_snapshot    = var.skip_final_snapshot
+  backup_retention_period   = var.backup_retention_period
+  backup_window             = var.backup_window
+  maintenance_window        = var.maintenance_window
+  skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.tags.Project}-db-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
 
   # Захист
-  deletion_protection = var.deletion_protection
+  deletion_protection   = var.deletion_protection
   copy_tags_to_snapshot = true
 
   # Моніторинг
   monitoring_interval = var.monitoring_interval
   monitoring_role_arn = var.monitoring_interval > 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
 
-  performance_insights_enabled = var.performance_insights_enabled
+  performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_enabled ? 7 : null
 
   # Логи
   enabled_cloudwatch_logs_exports = local.logs_exports
 
   # Автоматичні оновлення
-  auto_minor_version_upgrade = true
+  auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
 
   tags = merge(var.tags, {

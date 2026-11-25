@@ -5,8 +5,8 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = var.namespace
     labels = {
-      name = var.namespace
-      "app.kubernetes.io/name" = "argocd"
+      name                         = var.namespace
+      "app.kubernetes.io/name"     = "argocd"
       "app.kubernetes.io/instance" = var.release_name
     }
   }
@@ -18,7 +18,7 @@ resource "kubernetes_secret" "argocd_admin" {
     name      = "argocd-initial-admin-secret"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "argocd-secret"
+      "app.kubernetes.io/name"    = "argocd-secret"
       "app.kubernetes.io/part-of" = "argocd"
     }
   }
@@ -36,10 +36,10 @@ resource "kubernetes_service_account" "argocd" {
     name      = "argocd-application-controller"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "argocd-application-controller"
-      "app.kubernetes.io/instance" = var.release_name
+      "app.kubernetes.io/name"      = "argocd-application-controller"
+      "app.kubernetes.io/instance"  = var.release_name
       "app.kubernetes.io/component" = "application-controller"
-      "app.kubernetes.io/part-of" = "argocd"
+      "app.kubernetes.io/part-of"   = "argocd"
     }
   }
 
@@ -51,10 +51,10 @@ resource "kubernetes_cluster_role" "argocd" {
   metadata {
     name = "argocd-application-controller"
     labels = {
-      "app.kubernetes.io/name" = "argocd-application-controller"
-      "app.kubernetes.io/instance" = var.release_name
+      "app.kubernetes.io/name"      = "argocd-application-controller"
+      "app.kubernetes.io/instance"  = var.release_name
       "app.kubernetes.io/component" = "application-controller"
-      "app.kubernetes.io/part-of" = "argocd"
+      "app.kubernetes.io/part-of"   = "argocd"
     }
   }
 
@@ -66,7 +66,7 @@ resource "kubernetes_cluster_role" "argocd" {
 
   rule {
     non_resource_urls = ["*"]
-    verbs            = ["*"]
+    verbs             = ["*"]
   }
 }
 
@@ -75,10 +75,10 @@ resource "kubernetes_cluster_role_binding" "argocd" {
   metadata {
     name = "argocd-application-controller"
     labels = {
-      "app.kubernetes.io/name" = "argocd-application-controller"
-      "app.kubernetes.io/instance" = var.release_name
+      "app.kubernetes.io/name"      = "argocd-application-controller"
+      "app.kubernetes.io/instance"  = var.release_name
       "app.kubernetes.io/component" = "application-controller"
-      "app.kubernetes.io/part-of" = "argocd"
+      "app.kubernetes.io/part-of"   = "argocd"
     }
   }
 
@@ -103,7 +103,7 @@ resource "kubernetes_config_map" "argocd_config" {
     name      = "argocd-cmd-params-cm"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "argocd-cmd-params-cm"
+      "app.kubernetes.io/name"    = "argocd-cmd-params-cm"
       "app.kubernetes.io/part-of" = "argocd"
     }
   }
@@ -299,17 +299,17 @@ resource "kubernetes_service" "argocd_lb" {
     name      = "${var.release_name}-server-loadbalancer"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "argocd-server"
-      "app.kubernetes.io/instance" = var.release_name
+      "app.kubernetes.io/name"      = "argocd-server"
+      "app.kubernetes.io/instance"  = var.release_name
       "app.kubernetes.io/component" = "server"
-      "app.kubernetes.io/part-of" = "argocd"
+      "app.kubernetes.io/part-of"   = "argocd"
     }
     annotations = var.load_balancer_annotations
   }
 
   spec {
     type = "LoadBalancer"
-    
+
     port {
       name        = "http"
       port        = 80
@@ -325,7 +325,7 @@ resource "kubernetes_service" "argocd_lb" {
     }
 
     selector = {
-      "app.kubernetes.io/name" = "argocd-server"
+      "app.kubernetes.io/name"     = "argocd-server"
       "app.kubernetes.io/instance" = var.release_name
     }
 
@@ -341,17 +341,17 @@ resource "kubernetes_ingress_v1" "argocd" {
     name      = "${var.release_name}-server-ingress"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "argocd-server"
-      "app.kubernetes.io/instance" = var.release_name
+      "app.kubernetes.io/name"      = "argocd-server"
+      "app.kubernetes.io/instance"  = var.release_name
       "app.kubernetes.io/component" = "server"
-      "app.kubernetes.io/part-of" = "argocd"
+      "app.kubernetes.io/part-of"   = "argocd"
     }
     annotations = merge(
       {
-        "kubernetes.io/ingress.class" = var.ingress_class_name
-        "nginx.ingress.kubernetes.io/ssl-redirect" = "true"
+        "kubernetes.io/ingress.class"                    = var.ingress_class_name
+        "nginx.ingress.kubernetes.io/ssl-redirect"       = "true"
         "nginx.ingress.kubernetes.io/force-ssl-redirect" = "true"
-        "nginx.ingress.kubernetes.io/backend-protocol" = "GRPC"
+        "nginx.ingress.kubernetes.io/backend-protocol"   = "GRPC"
       },
       var.ingress_annotations
     )
@@ -368,12 +368,12 @@ resource "kubernetes_ingress_v1" "argocd" {
 
     rule {
       host = var.ingress_hostname
-      
+
       http {
         path {
           path      = "/"
           path_type = "Prefix"
-          
+
           backend {
             service {
               name = "${var.release_name}-argocd-server"
@@ -396,10 +396,10 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "argocd_server" {
     name      = "${var.release_name}-server-hpa"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
-      "app.kubernetes.io/name" = "argocd-server"
-      "app.kubernetes.io/instance" = var.release_name
+      "app.kubernetes.io/name"      = "argocd-server"
+      "app.kubernetes.io/instance"  = var.release_name
       "app.kubernetes.io/component" = "server"
-      "app.kubernetes.io/part-of" = "argocd"
+      "app.kubernetes.io/part-of"   = "argocd"
     }
   }
 
@@ -448,7 +448,7 @@ resource "kubernetes_manifest" "demo_application" {
       name      = "demo-app"
       namespace = kubernetes_namespace.argocd.metadata[0].name
       labels = {
-        "app.kubernetes.io/name" = "demo-app"
+        "app.kubernetes.io/name"     = "demo-app"
         "app.kubernetes.io/instance" = var.release_name
       }
     }
@@ -489,36 +489,36 @@ resource "kubernetes_manifest" "app_project" {
       name      = var.app_project_name
       namespace = kubernetes_namespace.argocd.metadata[0].name
       labels = {
-        "app.kubernetes.io/name" = var.app_project_name
+        "app.kubernetes.io/name"     = var.app_project_name
         "app.kubernetes.io/instance" = var.release_name
       }
     }
     spec = {
       description = "Application project for ${var.app_project_name}"
-      
+
       sourceRepos = var.app_project_source_repos
-      
+
       destinations = [
         {
           namespace = "*"
           server    = "https://kubernetes.default.svc"
         }
       ]
-      
+
       clusterResourceWhitelist = [
         {
           group = "*"
           kind  = "*"
         }
       ]
-      
+
       namespaceResourceWhitelist = [
         {
           group = "*"
           kind  = "*"
         }
       ]
-      
+
       roles = [
         {
           name = "admin"
