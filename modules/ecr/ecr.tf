@@ -12,7 +12,7 @@ resource "aws_ecr_repository" "main" {
   # Шифрування
   encryption_configuration {
     encryption_type = var.encryption_type
-    kms_key        = var.encryption_type == "KMS" ? var.kms_key : null
+    kms_key         = var.encryption_type == "KMS" ? var.kms_key : null
   }
 
   tags = merge(var.tags, {
@@ -113,9 +113,9 @@ resource "aws_ecr_replication_configuration" "main" {
 
 # Registry scanning configuration (якщо потрібно)
 resource "aws_ecr_registry_scanning_configuration" "main" {
-  count       = var.enable_registry_scanning ? 1 : 0
-  scan_type   = var.registry_scan_type
-  
+  count     = var.enable_registry_scanning ? 1 : 0
+  scan_type = var.registry_scan_type
+
   dynamic "rule" {
     for_each = var.registry_scan_filters
     content {

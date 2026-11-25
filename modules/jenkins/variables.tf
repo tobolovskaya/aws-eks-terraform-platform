@@ -5,7 +5,7 @@ variable "release_name" {
   description = "Назва Helm release для Jenkins"
   type        = string
   default     = "jenkins"
-  
+
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.release_name))
     error_message = "Release name повинна містити тільки малі літери, цифри та дефіси."
@@ -16,7 +16,7 @@ variable "namespace" {
   description = "Kubernetes namespace для Jenkins"
   type        = string
   default     = "jenkins"
-  
+
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.namespace))
     error_message = "Namespace повинен містити тільки малі літери, цифри та дефіси."
@@ -46,7 +46,7 @@ variable "helm_timeout" {
   description = "Timeout для Helm операцій (секунди)"
   type        = number
   default     = 600
-  
+
   validation {
     condition     = var.helm_timeout >= 300 && var.helm_timeout <= 1800
     error_message = "Helm timeout повинен бути від 300 до 1800 секунд."
@@ -64,7 +64,7 @@ variable "admin_password" {
   description = "Пароль адміністратора Jenkins"
   type        = string
   sensitive   = true
-  
+
   validation {
     condition     = length(var.admin_password) >= 8
     error_message = "Пароль адміністратора повинен містити мінімум 8 символів."
@@ -138,7 +138,7 @@ variable "service_type" {
   description = "Тип Kubernetes service для Jenkins"
   type        = string
   default     = "ClusterIP"
-  
+
   validation {
     condition     = contains(["ClusterIP", "NodePort", "LoadBalancer"], var.service_type)
     error_message = "Service type повинен бути ClusterIP, NodePort або LoadBalancer."
@@ -155,7 +155,7 @@ variable "load_balancer_annotations" {
   description = "Анотації для LoadBalancer service"
   type        = map(string)
   default = {
-    "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+    "service.beta.kubernetes.io/aws-load-balancer-type"   = "nlb"
     "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
   }
 }
@@ -264,7 +264,7 @@ variable "hpa_min_replicas" {
   description = "Мінімальна кількість реплік для HPA"
   type        = number
   default     = 1
-  
+
   validation {
     condition     = var.hpa_min_replicas >= 1
     error_message = "Мінімальна кількість реплік повинна бути мінімум 1."
@@ -275,7 +275,7 @@ variable "hpa_max_replicas" {
   description = "Максимальна кількість реплік для HPA"
   type        = number
   default     = 3
-  
+
   validation {
     condition     = var.hpa_max_replicas >= 1
     error_message = "Максимальна кількість реплік повинна бути мінімум 1."
@@ -286,7 +286,7 @@ variable "hpa_target_cpu_utilization" {
   description = "Цільова утилізація CPU для HPA (%)"
   type        = number
   default     = 70
-  
+
   validation {
     condition     = var.hpa_target_cpu_utilization >= 1 && var.hpa_target_cpu_utilization <= 100
     error_message = "Цільова утилізація CPU повинна бути від 1% до 100%."
@@ -297,7 +297,7 @@ variable "hpa_target_memory_utilization" {
   description = "Цільова утилізація пам'яті для HPA (%)"
   type        = number
   default     = 80
-  
+
   validation {
     condition     = var.hpa_target_memory_utilization >= 1 && var.hpa_target_memory_utilization <= 100
     error_message = "Цільова утилізація пам'яті повинна бути від 1% до 100%."
@@ -353,7 +353,7 @@ variable "backup_retention_days" {
   description = "Кількість днів зберігання резервних копій"
   type        = number
   default     = 30
-  
+
   validation {
     condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
     error_message = "Період зберігання резервних копій повинен бути від 1 до 365 днів."
@@ -405,7 +405,7 @@ variable "agent_connection_timeout" {
   description = "Timeout для підключення агентів (секунди)"
   type        = number
   default     = 100
-  
+
   validation {
     condition     = var.agent_connection_timeout >= 30 && var.agent_connection_timeout <= 300
     error_message = "Timeout підключення агентів повинен бути від 30 до 300 секунд."

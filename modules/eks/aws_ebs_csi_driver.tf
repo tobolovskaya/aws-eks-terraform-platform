@@ -79,11 +79,12 @@ resource "aws_iam_role_policy" "ebs_csi_driver_kms" {
 resource "aws_eks_addon" "ebs_csi_driver" {
   count = var.enable_ebs_csi_driver ? 1 : 0
 
-  cluster_name             = aws_eks_cluster.main.name
-  addon_name               = "aws-ebs-csi-driver"
-  addon_version            = var.ebs_csi_driver_version
-  service_account_role_arn = aws_iam_role.ebs_csi_driver[0].arn
-  resolve_conflicts        = "OVERWRITE"
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "aws-ebs-csi-driver"
+  addon_version               = var.ebs_csi_driver_version
+  service_account_role_arn    = aws_iam_role.ebs_csi_driver[0].arn
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
 
   tags = var.tags
 
@@ -191,11 +192,11 @@ resource "kubernetes_annotations" "default_storageclass" {
 
   api_version = "storage.k8s.io/v1"
   kind        = "StorageClass"
-  
+
   metadata {
     name = "gp2"
   }
-  
+
   annotations = {
     "storageclass.kubernetes.io/is-default-class" = "false"
   }

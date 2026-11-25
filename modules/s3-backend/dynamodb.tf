@@ -1,9 +1,9 @@
 # Створення DynamoDB таблиці для блокування стану Terraform
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
-  name           = var.dynamodb_table_name
-  billing_mode   = var.dynamodb_billing_mode
-  hash_key       = "LockID"
+  name         = var.dynamodb_table_name
+  billing_mode = var.dynamodb_billing_mode
+  hash_key     = "LockID"
 
   # Налаштування для on-demand billing
   dynamic "attribute" {

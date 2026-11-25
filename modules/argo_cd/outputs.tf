@@ -20,11 +20,11 @@ output "argocd_chart_version" {
 output "argocd_url" {
   description = "URL для доступу до Argo CD"
   value = var.ingress_enabled ? (
-    var.ingress_tls_enabled ? 
-    "https://${var.ingress_hostname}" : 
+    var.ingress_tls_enabled ?
+    "https://${var.ingress_hostname}" :
     "http://${var.ingress_hostname}"
-  ) : (
-    var.service_type == "LoadBalancer" && var.create_load_balancer_service ? 
+    ) : (
+    var.service_type == "LoadBalancer" && var.create_load_balancer_service ?
     "http://${try(kubernetes_service.argocd_lb[0].status[0].load_balancer[0].ingress[0].hostname, "pending")}" :
     "http://localhost:8080 (використовуйте kubectl port-forward)"
   )
@@ -152,7 +152,7 @@ output "argocd_cli_login_command" {
   description = "Команда для логіну через Argo CD CLI"
   value = var.ingress_enabled ? (
     "argocd login ${var.ingress_hostname} --username admin --password '${var.admin_password}'"
-  ) : (
+    ) : (
     "argocd login localhost:8080 --username admin --password '${var.admin_password}' --insecure"
   )
   sensitive = true
@@ -162,7 +162,7 @@ output "argocd_cli_context_command" {
   description = "Команда для встановлення контексту Argo CD CLI"
   value = var.ingress_enabled ? (
     "argocd context ${var.ingress_hostname}"
-  ) : (
+    ) : (
     "argocd context localhost:8080"
   )
 }
@@ -204,8 +204,8 @@ output "argocd_prometheus_enabled" {
 output "argocd_metrics_endpoints" {
   description = "Endpoints для Prometheus метрик"
   value = var.enable_metrics ? {
-    server     = "${helm_release.argocd.name}-argocd-server-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8083"
-    controller = "${helm_release.argocd.name}-argocd-application-controller-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8082"
+    server      = "${helm_release.argocd.name}-argocd-server-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8083"
+    controller  = "${helm_release.argocd.name}-argocd-application-controller-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8082"
     repo_server = "${helm_release.argocd.name}-argocd-repo-server-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8084"
   } : null
 }
@@ -215,11 +215,11 @@ output "argocd_features_enabled" {
   description = "Увімкнені функції Argo CD"
   value = {
     high_availability = var.enable_ha
-    metrics          = var.enable_metrics
-    notifications    = var.enable_notifications
-    applicationset   = var.enable_applicationset
-    dex             = var.enable_dex
-    webhooks        = var.enable_webhooks
+    metrics           = var.enable_metrics
+    notifications     = var.enable_notifications
+    applicationset    = var.enable_applicationset
+    dex               = var.enable_dex
+    webhooks          = var.enable_webhooks
   }
 }
 
@@ -238,20 +238,20 @@ output "argocd_chart_repository" {
 output "argocd_webhook_urls" {
   description = "URLs для Git webhooks"
   value = var.ingress_enabled ? {
-    github = var.ingress_tls_enabled ? 
-      "https://${var.ingress_hostname}/api/webhook" : 
-      "http://${var.ingress_hostname}/api/webhook"
-    gitlab = var.ingress_tls_enabled ? 
-      "https://${var.ingress_hostname}/api/webhook" : 
-      "http://${var.ingress_hostname}/api/webhook"
+    github = (var.ingress_tls_enabled ?
+      "https://${var.ingress_hostname}/api/webhook" :
+    "http://${var.ingress_hostname}/api/webhook")
+    gitlab = (var.ingress_tls_enabled ?
+      "https://${var.ingress_hostname}/api/webhook" :
+    "http://${var.ingress_hostname}/api/webhook")
   } : null
 }
 
 output "argocd_api_url" {
   description = "URL для Argo CD API"
   value = var.ingress_enabled ? (
-    var.ingress_tls_enabled ? 
-    "https://${var.ingress_hostname}/api/v1/" : 
+    var.ingress_tls_enabled ?
+    "https://${var.ingress_hostname}/api/v1/" :
     "http://${var.ingress_hostname}/api/v1/"
   ) : null
 }
@@ -260,14 +260,14 @@ output "argocd_api_url" {
 output "troubleshooting_commands" {
   description = "Корисні команди для діагностики"
   value = {
-    check_pods = "kubectl get pods -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/part-of=argocd"
-    describe_server = "kubectl describe pod -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/name=argocd-server"
+    check_pods          = "kubectl get pods -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/part-of=argocd"
+    describe_server     = "kubectl describe pod -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/name=argocd-server"
     describe_controller = "kubectl describe pod -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/name=argocd-application-controller"
-    check_service = "kubectl get svc -n ${kubernetes_namespace.argocd.metadata[0].name} ${helm_release.argocd.name}-argocd-server"
-    check_ingress = var.ingress_enabled ? "kubectl get ingress -n ${kubernetes_namespace.argocd.metadata[0].name}" : null
-    helm_history = "helm history ${helm_release.argocd.name} -n ${kubernetes_namespace.argocd.metadata[0].name}"
-    check_applications = "kubectl get applications -n ${kubernetes_namespace.argocd.metadata[0].name}"
-    check_appprojects = "kubectl get appprojects -n ${kubernetes_namespace.argocd.metadata[0].name}"
+    check_service       = "kubectl get svc -n ${kubernetes_namespace.argocd.metadata[0].name} ${helm_release.argocd.name}-argocd-server"
+    check_ingress       = var.ingress_enabled ? "kubectl get ingress -n ${kubernetes_namespace.argocd.metadata[0].name}" : null
+    helm_history        = "helm history ${helm_release.argocd.name} -n ${kubernetes_namespace.argocd.metadata[0].name}"
+    check_applications  = "kubectl get applications -n ${kubernetes_namespace.argocd.metadata[0].name}"
+    check_appprojects   = "kubectl get appprojects -n ${kubernetes_namespace.argocd.metadata[0].name}"
   }
 }
 
@@ -276,13 +276,13 @@ output "argocd_integration_info" {
   description = "Інформація для інтеграції з CI/CD системами"
   value = {
     server_url = var.ingress_enabled ? (
-      var.ingress_tls_enabled ? 
-      "https://${var.ingress_hostname}" : 
+      var.ingress_tls_enabled ?
+      "https://${var.ingress_hostname}" :
       "http://${var.ingress_hostname}"
     ) : "http://localhost:8080"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace      = kubernetes_namespace.argocd.metadata[0].name
     admin_username = "admin"
-    cli_version = "v2.9.3"
+    cli_version    = "v2.9.3"
   }
   sensitive = false
 }

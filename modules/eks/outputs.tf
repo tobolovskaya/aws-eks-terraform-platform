@@ -85,15 +85,15 @@ output "node_groups" {
   description = "Інформація про node groups"
   value = {
     for ng in aws_eks_node_group.main : ng.node_group_name => {
-      arn           = ng.arn
-      status        = ng.status
-      capacity_type = ng.capacity_type
+      arn            = ng.arn
+      status         = ng.status
+      capacity_type  = ng.capacity_type
       instance_types = ng.instance_types
-      ami_type      = ng.ami_type
-      node_role_arn = ng.node_role_arn
-      subnet_ids    = ng.subnet_ids
+      ami_type       = ng.ami_type
+      node_role_arn  = ng.node_role_arn
+      subnet_ids     = ng.subnet_ids
       scaling_config = ng.scaling_config
-      labels        = ng.labels
+      labels         = ng.labels
     }
   }
 }
@@ -106,7 +106,7 @@ output "ebs_csi_addon_arn" {
 
 output "ebs_csi_addon_status" {
   description = "Статус EBS CSI Driver addon"
-  value       = var.enable_ebs_csi_driver ? aws_eks_addon.ebs_csi_driver[0].status : null
+  value       = var.enable_ebs_csi_driver ? aws_eks_addon.ebs_csi_driver[0].addon_version : null
 }
 
 # Команди для підключення
@@ -177,11 +177,11 @@ output "subnet_ids" {
 output "cluster_info" {
   description = "Загальна інформація про кластер для використання в CI/CD"
   value = {
-    name                = aws_eks_cluster.main.name
-    endpoint            = aws_eks_cluster.main.endpoint
-    region              = data.aws_region.current.name
+    name                  = aws_eks_cluster.main.name
+    endpoint              = aws_eks_cluster.main.endpoint
+    region                = data.aws_region.current.name
     certificate_authority = aws_eks_cluster.main.certificate_authority[0].data
-    oidc_issuer_url     = aws_eks_cluster.main.identity[0].oidc[0].issuer
+    oidc_issuer_url       = aws_eks_cluster.main.identity[0].oidc[0].issuer
   }
   sensitive = true
 }

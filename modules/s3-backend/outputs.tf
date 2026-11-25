@@ -62,7 +62,7 @@ output "terraform_backend_config" {
 # Готовий блок backend для копіювання
 output "backend_configuration" {
   description = "Готова конфігурація backend для вставки в terraform блок"
-  value = <<-EOT
+  value       = <<-EOT
     terraform {
       backend "s3" {
         bucket         = "${aws_s3_bucket.terraform_state.id}"

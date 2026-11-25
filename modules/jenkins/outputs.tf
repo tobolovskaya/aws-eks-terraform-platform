@@ -20,11 +20,11 @@ output "jenkins_chart_version" {
 output "jenkins_url" {
   description = "URL для доступу до Jenkins"
   value = var.ingress_enabled ? (
-    var.ingress_tls_enabled ? 
-    "https://${var.ingress_hostname}" : 
+    var.ingress_tls_enabled ?
+    "https://${var.ingress_hostname}" :
     "http://${var.ingress_hostname}"
-  ) : (
-    var.service_type == "LoadBalancer" && var.create_load_balancer_service ? 
+    ) : (
+    var.service_type == "LoadBalancer" && var.create_load_balancer_service ?
     "http://${try(kubernetes_service.jenkins_lb[0].status[0].load_balancer[0].ingress[0].hostname, "pending")}" :
     "http://localhost:8080 (використовуйте kubectl port-forward)"
   )
@@ -227,8 +227,8 @@ output "jenkins_chart_repository" {
 output "jenkins_webhook_url" {
   description = "URL для GitHub/GitLab webhooks"
   value = var.ingress_enabled ? (
-    var.ingress_tls_enabled ? 
-    "https://${var.ingress_hostname}/github-webhook/" : 
+    var.ingress_tls_enabled ?
+    "https://${var.ingress_hostname}/github-webhook/" :
     "http://${var.ingress_hostname}/github-webhook/"
   ) : null
 }
@@ -236,8 +236,8 @@ output "jenkins_webhook_url" {
 output "jenkins_api_url" {
   description = "URL для Jenkins API"
   value = var.ingress_enabled ? (
-    var.ingress_tls_enabled ? 
-    "https://${var.ingress_hostname}/api/" : 
+    var.ingress_tls_enabled ?
+    "https://${var.ingress_hostname}/api/" :
     "http://${var.ingress_hostname}/api/"
   ) : null
 }
@@ -246,11 +246,11 @@ output "jenkins_api_url" {
 output "troubleshooting_commands" {
   description = "Корисні команди для діагностики"
   value = {
-    check_pods = "kubectl get pods -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name}"
-    describe_pod = "kubectl describe pod -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name}"
-    check_pvc = var.create_pvc ? "kubectl get pvc -n ${kubernetes_namespace.jenkins.metadata[0].name} ${kubernetes_persistent_volume_claim.jenkins_home[0].metadata[0].name}" : null
+    check_pods    = "kubectl get pods -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name}"
+    describe_pod  = "kubectl describe pod -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name}"
+    check_pvc     = var.create_pvc ? "kubectl get pvc -n ${kubernetes_namespace.jenkins.metadata[0].name} ${kubernetes_persistent_volume_claim.jenkins_home[0].metadata[0].name}" : null
     check_service = "kubectl get svc -n ${kubernetes_namespace.jenkins.metadata[0].name} ${helm_release.jenkins.name}-jenkins"
     check_ingress = var.ingress_enabled ? "kubectl get ingress -n ${kubernetes_namespace.jenkins.metadata[0].name}" : null
-    helm_history = "helm history ${helm_release.jenkins.name} -n ${kubernetes_namespace.jenkins.metadata[0].name}"
+    helm_history  = "helm history ${helm_release.jenkins.name} -n ${kubernetes_namespace.jenkins.metadata[0].name}"
   }
 }

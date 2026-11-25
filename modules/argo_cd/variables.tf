@@ -5,7 +5,7 @@ variable "release_name" {
   description = "Назва Helm release для Argo CD"
   type        = string
   default     = "argocd"
-  
+
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.release_name))
     error_message = "Release name повинна містити тільки малі літери, цифри та дефіси."
@@ -16,7 +16,7 @@ variable "namespace" {
   description = "Kubernetes namespace для Argo CD"
   type        = string
   default     = "argocd"
-  
+
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.namespace))
     error_message = "Namespace повинен містити тільки малі літери, цифри та дефіси."
@@ -46,7 +46,7 @@ variable "helm_timeout" {
   description = "Timeout для Helm операцій (секунди)"
   type        = number
   default     = 600
-  
+
   validation {
     condition     = var.helm_timeout >= 300 && var.helm_timeout <= 1800
     error_message = "Helm timeout повинен бути від 300 до 1800 секунд."
@@ -58,7 +58,7 @@ variable "admin_password" {
   description = "Пароль адміністратора Argo CD"
   type        = string
   sensitive   = true
-  
+
   validation {
     condition     = length(var.admin_password) >= 8
     error_message = "Пароль адміністратора повинен містити мінімум 8 символів."
@@ -163,7 +163,7 @@ variable "controller_replicas" {
   description = "Кількість реплік Application Controller (HA режим)"
   type        = number
   default     = 1
-  
+
   validation {
     condition     = var.controller_replicas >= 1 && var.controller_replicas <= 5
     error_message = "Кількість реплік Controller повинна бути від 1 до 5."
@@ -174,7 +174,7 @@ variable "server_replicas" {
   description = "Кількість реплік Server (HA режим)"
   type        = number
   default     = 2
-  
+
   validation {
     condition     = var.server_replicas >= 1 && var.server_replicas <= 10
     error_message = "Кількість реплік Server повинна бути від 1 до 10."
@@ -185,7 +185,7 @@ variable "repo_server_replicas" {
   description = "Кількість реплік Repo Server (HA режим)"
   type        = number
   default     = 2
-  
+
   validation {
     condition     = var.repo_server_replicas >= 1 && var.repo_server_replicas <= 10
     error_message = "Кількість реплік Repo Server повинна бути від 1 до 10."
@@ -197,7 +197,7 @@ variable "service_type" {
   description = "Тип Kubernetes service для Argo CD"
   type        = string
   default     = "ClusterIP"
-  
+
   validation {
     condition     = contains(["ClusterIP", "NodePort", "LoadBalancer"], var.service_type)
     error_message = "Service type повинен бути ClusterIP, NodePort або LoadBalancer."
@@ -214,7 +214,7 @@ variable "load_balancer_annotations" {
   description = "Анотації для LoadBalancer service"
   type        = map(string)
   default = {
-    "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+    "service.beta.kubernetes.io/aws-load-balancer-type"   = "nlb"
     "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
   }
 }
@@ -281,7 +281,7 @@ variable "hpa_min_replicas" {
   description = "Мінімальна кількість реплік для HPA"
   type        = number
   default     = 2
-  
+
   validation {
     condition     = var.hpa_min_replicas >= 1
     error_message = "Мінімальна кількість реплік повинна бути мінімум 1."
@@ -292,7 +292,7 @@ variable "hpa_max_replicas" {
   description = "Максимальна кількість реплік для HPA"
   type        = number
   default     = 5
-  
+
   validation {
     condition     = var.hpa_max_replicas >= 1
     error_message = "Максимальна кількість реплік повинна бути мінімум 1."
@@ -303,7 +303,7 @@ variable "hpa_target_cpu_utilization" {
   description = "Цільова утилізація CPU для HPA (%)"
   type        = number
   default     = 70
-  
+
   validation {
     condition     = var.hpa_target_cpu_utilization >= 1 && var.hpa_target_cpu_utilization <= 100
     error_message = "Цільова утилізація CPU повинна бути від 1% до 100%."
@@ -314,7 +314,7 @@ variable "hpa_target_memory_utilization" {
   description = "Цільова утилізація пам'яті для HPA (%)"
   type        = number
   default     = 80
-  
+
   validation {
     condition     = var.hpa_target_memory_utilization >= 1 && var.hpa_target_memory_utilization <= 100
     error_message = "Цільова утилізація пам'яті повинна бути від 1% до 100%."
@@ -477,7 +477,7 @@ variable "backup_retention_days" {
   description = "Кількість днів зберігання резервних копій"
   type        = number
   default     = 30
-  
+
   validation {
     condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
     error_message = "Період зберігання резервних копій повинен бути від 1 до 365 днів."
@@ -505,7 +505,7 @@ variable "log_level" {
   description = "Рівень логування для Argo CD"
   type        = string
   default     = "info"
-  
+
   validation {
     condition     = contains(["debug", "info", "warn", "error"], var.log_level)
     error_message = "Log level повинен бути одним з: debug, info, warn, error."
@@ -516,7 +516,7 @@ variable "log_format" {
   description = "Формат логування для Argo CD"
   type        = string
   default     = "text"
-  
+
   validation {
     condition     = contains(["text", "json"], var.log_format)
     error_message = "Log format повинен бути text або json."
@@ -567,7 +567,7 @@ variable "sync_timeout" {
   description = "Timeout для sync операцій (секунди)"
   type        = number
   default     = 300
-  
+
   validation {
     condition     = var.sync_timeout >= 60 && var.sync_timeout <= 3600
     error_message = "Sync timeout повинен бути від 60 до 3600 секунд."
@@ -578,7 +578,7 @@ variable "self_heal_timeout" {
   description = "Timeout для self-heal операцій (секунди)"
   type        = number
   default     = 5
-  
+
   validation {
     condition     = var.self_heal_timeout >= 1 && var.self_heal_timeout <= 60
     error_message = "Self-heal timeout повинен бути від 1 до 60 секунд."

@@ -4,7 +4,7 @@
 variable "cluster_name" {
   description = "Назва EKS кластера"
   type        = string
-  
+
   validation {
     condition     = can(regex("^[a-zA-Z][a-zA-Z0-9-]*$", var.cluster_name))
     error_message = "Назва кластера повинна починатися з літери та містити тільки літери, цифри та дефіси."
@@ -15,7 +15,7 @@ variable "kubernetes_version" {
   description = "Версія Kubernetes"
   type        = string
   default     = "1.28"
-  
+
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+$", var.kubernetes_version))
     error_message = "Версія Kubernetes повинна бути у форматі X.Y (наприклад, 1.28)."
@@ -31,7 +31,7 @@ variable "vpc_id" {
 variable "subnet_ids" {
   description = "Список ID підмереж для EKS кластера"
   type        = list(string)
-  
+
   validation {
     condition     = length(var.subnet_ids) >= 2
     error_message = "Потрібно мінімум 2 підмережі для EKS кластера."
@@ -68,7 +68,7 @@ variable "cluster_log_types" {
   description = "Типи логів для увімкнення в CloudWatch"
   type        = list(string)
   default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-  
+
   validation {
     condition = alltrue([
       for log_type in var.cluster_log_types : contains([
@@ -96,18 +96,18 @@ variable "cluster_encryption_config_kms_key_id" {
 variable "node_groups" {
   description = "Конфігурація node groups"
   type = list(object({
-    name                         = string
-    instance_types              = list(string)
-    ami_type                    = string
-    capacity_type               = string
-    desired_size                = number
-    max_size                    = number
-    min_size                    = number
-    max_unavailable_percentage  = number
-    disk_size                   = number
-    disk_type                   = string
-    subnet_ids                  = list(string)
-    labels                      = map(string)
+    name                       = string
+    instance_types             = list(string)
+    ami_type                   = string
+    capacity_type              = string
+    desired_size               = number
+    max_size                   = number
+    min_size                   = number
+    max_unavailable_percentage = number
+    disk_size                  = number
+    disk_type                  = string
+    subnet_ids                 = list(string)
+    labels                     = map(string)
     taints = list(object({
       key    = string
       value  = string
@@ -115,10 +115,10 @@ variable "node_groups" {
     }))
     bootstrap_extra_args = string
   }))
-  
+
   default = [
     {
-      name                        = "main"
+      name                       = "main"
       instance_types             = ["t3.medium"]
       ami_type                   = "AL2_x86_64"
       capacity_type              = "ON_DEMAND"
@@ -134,14 +134,14 @@ variable "node_groups" {
       bootstrap_extra_args       = ""
     }
   ]
-  
+
   validation {
     condition = alltrue([
       for ng in var.node_groups : ng.min_size <= ng.desired_size && ng.desired_size <= ng.max_size
     ])
     error_message = "Для кожної node group: min_size <= desired_size <= max_size."
   }
-  
+
   validation {
     condition = alltrue([
       for ng in var.node_groups : contains([
@@ -150,7 +150,7 @@ variable "node_groups" {
     ])
     error_message = "AMI type повинен бути одним з підтримуваних типів."
   }
-  
+
   validation {
     condition = alltrue([
       for ng in var.node_groups : contains(["ON_DEMAND", "SPOT"], ng.capacity_type)
