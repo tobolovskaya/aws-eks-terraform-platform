@@ -81,21 +81,18 @@ resource "aws_eks_cluster" "main" {
     subnet_ids              = var.subnet_ids
     endpoint_private_access = var.endpoint_private_access
     endpoint_public_access  = var.endpoint_public_access
-    public_access_cidrs     = var.endpoint_public_access_cidrs
+    public_access_cidrs     = var.endpoint_public_access ? var.endpoint_public_access_cidrs : null
   }
 
   # Увімкнення логування
   enabled_cluster_log_types = var.cluster_log_types
 
   # Шифрування секретів
-  dynamic "encryption_config" {
-    for_each = var.cluster_encryption_config_enabled ? [1] : []
-    content {
-      provider {
-        key_arn = var.cluster_encryption_config_kms_key_id
-      }
-      resources = ["secrets"]
+  encryption_config {
+    provider {
+      key_arn = local.create_kms_key ? aws_kms_key.eks_secrets[0].arn : var.cluster_encryption_config_kms_key_id
     }
+    resources = ["secrets"]
   }
 
   tags = var.tags
