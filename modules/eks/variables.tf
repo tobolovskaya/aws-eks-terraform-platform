@@ -41,7 +41,7 @@ variable "subnet_ids" {
 variable "allowed_cidr_blocks" {
   description = "CIDR блоки, яким дозволено доступ до API сервера"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 # Налаштування endpoint
@@ -54,13 +54,13 @@ variable "endpoint_private_access" {
 variable "endpoint_public_access" {
   description = "Увімкнути публічний доступ до API endpoint"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "endpoint_public_access_cidrs" {
   description = "CIDR блоки для публічного доступу до API endpoint"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 # Логування
@@ -80,14 +80,8 @@ variable "cluster_log_types" {
 }
 
 # Шифрування
-variable "cluster_encryption_config_enabled" {
-  description = "Увімкнути шифрування секретів в etcd"
-  type        = bool
-  default     = true
-}
-
 variable "cluster_encryption_config_kms_key_id" {
-  description = "ARN KMS ключа для шифрування секретів"
+  description = "ARN of an existing KMS key for EKS secrets encryption. Leave empty to create a new key."
   type        = string
   default     = ""
 }
