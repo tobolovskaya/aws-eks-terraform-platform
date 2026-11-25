@@ -443,7 +443,7 @@ variable "eks_cluster_name" {
 variable "kubernetes_version" {
   description = "Версія Kubernetes"
   type        = string
-  default     = "1.28"
+  default     = "1.35"
 }
 
 variable "node_groups" {
@@ -466,13 +466,12 @@ variable "node_groups" {
       value  = string
       effect = string
     }))
-    bootstrap_extra_args = string
   }))
   default = [
     {
       name                       = "main"
       instance_types             = ["t3.medium"]
-      ami_type                   = "AL2_x86_64"
+      ami_type                   = "AL2023_x86_64_STANDARD"
       capacity_type              = "ON_DEMAND"
       desired_size               = 2
       max_size                   = 4
@@ -483,7 +482,6 @@ variable "node_groups" {
       subnet_ids                 = []
       labels                     = {}
       taints                     = []
-      bootstrap_extra_args       = ""
     }
   ]
 }

@@ -14,7 +14,7 @@ variable "cluster_name" {
 variable "kubernetes_version" {
   description = "Версія Kubernetes"
   type        = string
-  default     = "1.28"
+  default     = "1.35"
 
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+$", var.kubernetes_version))
@@ -107,14 +107,13 @@ variable "node_groups" {
       value  = string
       effect = string
     }))
-    bootstrap_extra_args = string
   }))
 
   default = [
     {
       name                       = "main"
       instance_types             = ["t3.medium"]
-      ami_type                   = "AL2_x86_64"
+      ami_type                   = "AL2023_x86_64_STANDARD"
       capacity_type              = "ON_DEMAND"
       desired_size               = 2
       max_size                   = 4
@@ -125,7 +124,6 @@ variable "node_groups" {
       subnet_ids                 = []
       labels                     = {}
       taints                     = []
-      bootstrap_extra_args       = ""
     }
   ]
 
@@ -139,7 +137,7 @@ variable "node_groups" {
   validation {
     condition = alltrue([
       for ng in var.node_groups : contains([
-        "AL2_x86_64", "AL2_x86_64_GPU", "AL2_ARM_64", "CUSTOM", "BOTTLEROCKET_ARM_64", "BOTTLEROCKET_x86_64"
+        "AL2023_x86_64_STANDARD", "AL2023_ARM_64_STANDARD", "AL2023_x86_64_NVIDIA", "CUSTOM", "BOTTLEROCKET_ARM_64", "BOTTLEROCKET_x86_64"
       ], ng.ami_type)
     ])
     error_message = "AMI type повинен бути одним з підтримуваних типів."
