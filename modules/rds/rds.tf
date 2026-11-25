@@ -1,6 +1,7 @@
 # Створення звичайної RDS бази даних
 
 resource "aws_db_instance" "main" {
+  #checkov:skip=CKV2_AWS_69: TLS is enforced in the parameter group (rds.force_ssl / require_secure_transport, modules/rds/shared.tf). Checkov cannot resolve the dynamic parameter block.
   count = var.use_aurora ? 0 : 1
 
   # Основні параметри

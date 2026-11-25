@@ -29,12 +29,16 @@ locals {
   # Базові параметри для різних движків
   base_db_parameters = {
     postgres = {
+      "rds.force_ssl" = {
+        value        = "1"
+        apply_method = "immediate"
+      }
       "shared_preload_libraries" = {
         value        = "pg_stat_statements"
         apply_method = "pending-reboot"
       }
       "log_statement" = {
-        value        = "all"
+        value        = "ddl"
         apply_method = "immediate"
       }
       "log_min_duration_statement" = {
@@ -51,6 +55,10 @@ locals {
       }
     }
     mysql = {
+      "require_secure_transport" = {
+        value        = "1"
+        apply_method = "immediate"
+      }
       "innodb_buffer_pool_size" = {
         value        = "{DBInstanceClassMemory*3/4}"
         apply_method = "pending-reboot"
@@ -69,6 +77,10 @@ locals {
       }
     }
     mariadb = {
+      "require_secure_transport" = {
+        value        = "1"
+        apply_method = "immediate"
+      }
       "innodb_buffer_pool_size" = {
         value        = "{DBInstanceClassMemory*3/4}"
         apply_method = "pending-reboot"

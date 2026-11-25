@@ -118,6 +118,38 @@ resource "aws_s3_bucket" "access_logs" {
   })
 }
 
+# Захист bucket з логами доступу: ті самі правила, що й для bucket зі state
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  count  = var.enable_access_logging ? 1 : 0
+  bucket = aws_s3_bucket.access_logs[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "access_logs" {
+  count  = var.enable_access_logging ? 1 : 0
+  bucket = aws_s3_bucket.access_logs[0].id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Для S3 server access logs цільовий bucket має використовувати SSE-S3 (AES256), не KMS
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  count  = var.enable_access_logging ? 1 : 0
+  bucket = aws_s3_bucket.access_logs[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
 resource "aws_s3_bucket_logging" "terraform_state" {
   count  = var.enable_access_logging ? 1 : 0
   bucket = aws_s3_bucket.terraform_state.id
