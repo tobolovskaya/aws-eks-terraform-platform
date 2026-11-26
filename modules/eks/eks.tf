@@ -37,6 +37,7 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSVPCResourceControlle
 
 # Security Group для EKS кластера
 resource "aws_security_group" "cluster" {
+  #checkov:skip=CKV_AWS_382: control plane needs outbound HTTPS to AWS APIs; traffic leaves via NAT, no inbound from internet
   name_prefix = "${var.cluster_name}-cluster-"
   description = "EKS control plane security group"
   vpc_id      = var.vpc_id
@@ -182,6 +183,7 @@ resource "aws_launch_template" "node_group" {
 
 # Security Group для node groups
 resource "aws_security_group" "node_group" {
+  #checkov:skip=CKV_AWS_382: nodes pull images and call AWS APIs via NAT; VPC endpoints for every service would replace this but cost more
   name_prefix = "${var.cluster_name}-node-group-"
   description = "EKS worker nodes security group"
   vpc_id      = var.vpc_id

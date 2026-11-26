@@ -2,6 +2,7 @@
 
 # Aurora Cluster
 resource "aws_rds_cluster" "main" {
+  #checkov:skip=CKV2_AWS_8: automated RDS backups (backup_retention_period) are used instead of a separate AWS Backup plan
   count = var.use_aurora ? 1 : 0
 
   # Основні параметри
