@@ -3,6 +3,9 @@
 # Local values to work out parameters
 locals {
   # Engine selection for Aurora
+  # URL scheme for the connection string
+  url_scheme = strcontains(var.engine, "mysql") || var.engine == "mariadb" ? "mysql" : "postgresql"
+
   aurora_engine = var.use_aurora ? (
     var.engine == "postgres" ? "aurora-postgresql" :
     var.engine == "mysql" ? "aurora-mysql" :

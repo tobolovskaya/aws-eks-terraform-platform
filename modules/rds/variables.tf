@@ -73,12 +73,6 @@ variable "username" {
   default     = "dbadmin"
 }
 
-variable "password" {
-  description = "Master user password"
-  type        = string
-  sensitive   = true
-}
-
 variable "port" {
   description = "Database port (picked from the engine if not set)"
   type        = number
