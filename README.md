@@ -76,6 +76,7 @@ Checkov findings went from **33 to 0**: 18 fixed in code, 15 skipped with a writ
 | #21 | RDS master password managed by Secrets Manager (`manage_master_user_password`) | The password is generated and rotated by AWS and never appears in variables, plans or Terraform state | |
 | #23 | One Django folder; secret key, debug and database settings from environment variables; health and readiness endpoints | The image build referenced a missing folder, the secret key and `DEBUG = True` were hardcoded, and the Kubernetes probes pointed to URLs that did not exist | |
 | #24 | GitHub Actions pinned to commit SHAs (kept current by Dependabot), tflint in CI, 55 unused variables removed | A moved tag cannot change what CI runs. Variables such as `enable_csrf_protection` were accepted but did nothing, which gave a false sense of security | |
+| #25 | `terraform test` with mocked providers: private EKS API, KMS for secrets, IMDSv2 with hop limit 1, managed DB password, immutable ECR, locked default SG, flow logs | The hardening is now checked on every pull request without an AWS account: if a secure default is changed, CI fails. The first run found a real bug: node groups got an empty subnet list, so `apply` would have failed. They now fall back to the cluster subnets | |
 
 Other defaults:
 
@@ -87,7 +88,7 @@ Other defaults:
 
 This project creates **billable AWS resources** that are charged per hour even when idle: the EKS control plane, EC2 worker nodes, the NAT Gateway, RDS and load balancers. It is not covered by the AWS Free Tier. Estimate your own region and sizes with the [AWS Pricing Calculator](https://calculator.aws/).
 
-The CI pipeline only runs `terraform validate` and Checkov. Nothing is ever created in AWS from this repository.
+The CI pipeline runs `terraform validate`, `terraform test` with mocked providers, tflint and Checkov. Nothing is ever created in AWS from this repository.
 
 - To review what would be created, run `terraform plan` only.
 - If you run `apply`, clean up with `terraform destroy` afterwards.
@@ -131,12 +132,14 @@ terraform fmt -check -recursive
 terraform init -backend=false && terraform validate
 checkov -d . --framework terraform --compact --quiet
 tflint --init && tflint --recursive
+terraform test                        # security tests, mocked providers, no AWS account needed
 ```
 
 ## Project structure
 
 ```
-├── .github/workflows/terraform.yml   # fmt, validate, Checkov, tflint
+├── .github/workflows/terraform.yml   # fmt, validate, test, Checkov, tflint
+├── tests/security.tftest.hcl         # security regression tests (mocked AWS)
 ├── bootstrap/                        # one-time S3 + DynamoDB for remote state
 ├── main.tf                           # wires all modules together
 ├── variables.tf                      # root input variables

@@ -244,7 +244,8 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = var.node_groups[count.index].name
   node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids      = var.node_groups[count.index].subnet_ids
+  # Empty list in the node group config means: use the cluster subnets
+  subnet_ids = length(var.node_groups[count.index].subnet_ids) > 0 ? var.node_groups[count.index].subnet_ids : var.subnet_ids
 
   # Instance settings
   instance_types = var.node_groups[count.index].instance_types

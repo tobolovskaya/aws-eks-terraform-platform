@@ -44,7 +44,7 @@ node_groups = [
     max_unavailable_percentage = 25
     disk_size                  = 50
     disk_type                  = "gp3"
-    subnet_ids                 = []  # Filled in automatically
+    subnet_ids                 = []  # empty = use the cluster subnets
     labels                     = {
       Environment = "dev"
       NodeGroup   = "main"
