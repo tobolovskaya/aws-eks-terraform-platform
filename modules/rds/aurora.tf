@@ -16,7 +16,7 @@ resource "aws_rds_cluster" "main" {
   # RDS creates the password and keeps it in Secrets Manager with rotation,
   # so it never appears in Terraform variables, plans or state.
   manage_master_user_password = true
-  port            = local.default_port
+  port                        = local.default_port
 
   # Network and security
   db_subnet_group_name   = aws_db_subnet_group.main.name
