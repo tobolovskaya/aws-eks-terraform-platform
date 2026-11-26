@@ -144,7 +144,8 @@ checkov -d . --framework terraform --compact --quiet
 
 ## Roadmap
 
-- [ ] `Django/Jenkinsfile`: stop mounting `/var/run/docker.sock`, build images without a Docker daemon, pin image versions
+- [x] `Django/Jenkinsfile`: no more `/var/run/docker.sock`; images are built with Kaniko and pushed to ECR through the IRSA role
+- [ ] Pin the `kubectl` and `helm` agent images to fixed versions
 - [ ] Fix or document (`#checkov:skip` with a reason) the remaining Checkov findings, then make the CI scan blocking
 - [ ] Drop `ecr:BatchDeleteImage` from the optional cross-account ECR policy
 
