@@ -16,12 +16,14 @@ spec:
     - cat
     tty: true
   - name: kubectl
-    image: bitnami/kubectl:latest
+    # Pinned: same version as the cluster. bitnami/kubectl no longer has free versioned tags.
+    image: alpine/k8s:1.35.3
     command:
     - cat
     tty: true
   - name: helm
-    image: alpine/helm:latest
+    # Pinned: alpine/k8s ships kubectl and helm together
+    image: alpine/k8s:1.35.3
     command:
     - cat
     tty: true
