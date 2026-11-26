@@ -40,3 +40,7 @@ terraform.rc
 # Ignore log files
 *.log
 .env
+
+# Python
+__pycache__/
+*.pyc

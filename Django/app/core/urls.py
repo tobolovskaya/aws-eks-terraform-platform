@@ -17,6 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from core.health import health, ready
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Used by the Kubernetes liveness and readiness probes (charts/django-app)
+    path('health/', health),
+    path('ready/', ready),
 ]
