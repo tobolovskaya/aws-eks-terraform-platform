@@ -420,12 +420,6 @@ variable "jenkins_enable_prometheus_monitoring" {
   default     = true
 }
 
-variable "jenkins_prometheus_scrape_interval" {
-  description = "Prometheus scrape interval"
-  type        = string
-  default     = "30s"
-}
-
 variable "jenkins_enable_backup" {
   description = "Enable automatic backups"
   type        = bool
@@ -438,46 +432,10 @@ variable "jenkins_backup_schedule" {
   default     = "0 2 * * *"
 }
 
-variable "jenkins_backup_retention_days" {
-  description = "Number of days to keep backups"
-  type        = number
-  default     = 30
-}
-
-variable "jenkins_timezone" {
-  description = "Time zone for Jenkins"
-  type        = string
-  default     = "UTC"
-}
-
 variable "jenkins_java_opts" {
   description = "Java options for Jenkins"
   type        = string
   default     = "-Xmx2g -Xms1g"
-}
-
-variable "jenkins_jenkins_opts" {
-  description = "Jenkins options"
-  type        = string
-  default     = ""
-}
-
-variable "jenkins_enable_csrf_protection" {
-  description = "Enable CSRF protection"
-  type        = bool
-  default     = true
-}
-
-variable "jenkins_enable_script_security" {
-  description = "Enable script security"
-  type        = bool
-  default     = true
-}
-
-variable "jenkins_agent_connection_timeout" {
-  description = "Timeout for agent connections"
-  type        = number
-  default     = 100
 }
 
 variable "argocd_release_name" {
@@ -736,30 +694,6 @@ variable "argocd_enable_prometheus_monitoring" {
   default     = true
 }
 
-variable "argocd_prometheus_scrape_interval" {
-  description = "Prometheus scrape interval"
-  type        = string
-  default     = "30s"
-}
-
-variable "argocd_enable_backup" {
-  description = "Enable automatic backups"
-  type        = bool
-  default     = false
-}
-
-variable "argocd_backup_schedule" {
-  description = "Cron schedule for backups"
-  type        = string
-  default     = "0 2 * * *"
-}
-
-variable "argocd_backup_retention_days" {
-  description = "Number of days to keep backups"
-  type        = number
-  default     = 30
-}
-
 variable "argocd_create_demo_application" {
   description = "Create a demo Application"
   type        = bool
@@ -820,54 +754,10 @@ variable "argocd_app_project_developer_groups" {
   default     = []
 }
 
-variable "argocd_timezone" {
-  description = "Time zone for Argo CD"
-  type        = string
-  default     = "UTC"
-}
-
-variable "argocd_log_level" {
-  description = "Log level"
-  type        = string
-  default     = "info"
-}
-
-variable "argocd_log_format" {
-  description = "Log format"
-  type        = string
-  default     = "text"
-}
-
-variable "argocd_sync_timeout" {
-  description = "Timeout for sync operations"
-  type        = number
-  default     = 300
-}
-
-variable "argocd_self_heal_timeout" {
-  description = "Timeout for self-heal operations"
-  type        = number
-  default     = 5
-}
-
 variable "argocd_enable_webhooks" {
   description = "Enable webhook support"
   type        = bool
   default     = true
-}
-
-variable "argocd_webhook_github_secret" {
-  description = "Secret for GitHub webhooks"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
-variable "argocd_webhook_gitlab_secret" {
-  description = "Secret for GitLab webhooks"
-  type        = string
-  default     = ""
-  sensitive   = true
 }
 
 # Monitoring variables

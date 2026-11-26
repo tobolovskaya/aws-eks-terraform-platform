@@ -150,20 +150,13 @@ module "jenkins" {
 
   # Monitoring
   enable_prometheus_monitoring = var.jenkins_enable_prometheus_monitoring
-  prometheus_scrape_interval   = var.jenkins_prometheus_scrape_interval
 
   # Backup
   enable_backup         = var.jenkins_enable_backup
   backup_schedule       = var.jenkins_backup_schedule
-  backup_retention_days = var.jenkins_backup_retention_days
 
   # Extra settings
-  timezone                 = var.jenkins_timezone
   java_opts                = var.jenkins_java_opts
-  jenkins_opts             = var.jenkins_jenkins_opts
-  enable_csrf_protection   = var.jenkins_enable_csrf_protection
-  enable_script_security   = var.jenkins_enable_script_security
-  agent_connection_timeout = var.jenkins_agent_connection_timeout
 
   tags = var.common_tags
 
@@ -229,12 +222,8 @@ module "argocd" {
 
   # Monitoring
   enable_prometheus_monitoring = var.argocd_enable_prometheus_monitoring
-  prometheus_scrape_interval   = var.argocd_prometheus_scrape_interval
 
   # Backup
-  enable_backup         = var.argocd_enable_backup
-  backup_schedule       = var.argocd_backup_schedule
-  backup_retention_days = var.argocd_backup_retention_days
 
   # GitOps settings
   create_demo_application  = var.argocd_create_demo_application
@@ -251,18 +240,10 @@ module "argocd" {
   app_project_developer_groups = var.argocd_app_project_developer_groups
 
   # Extra settings
-  timezone          = var.argocd_timezone
-  log_level         = var.argocd_log_level
-  log_format        = var.argocd_log_format
-  sync_timeout      = var.argocd_sync_timeout
-  self_heal_timeout = var.argocd_self_heal_timeout
 
   # Webhooks
   enable_webhooks       = var.argocd_enable_webhooks
-  webhook_github_secret = var.argocd_webhook_github_secret
-  webhook_gitlab_secret = var.argocd_webhook_gitlab_secret
 
-  tags = var.common_tags
 
   depends_on = [
     module.eks,

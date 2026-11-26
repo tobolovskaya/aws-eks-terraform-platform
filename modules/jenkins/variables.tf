@@ -305,35 +305,11 @@ variable "hpa_target_memory_utilization" {
 }
 
 # Security
-variable "security_context_enabled" {
-  description = "Enable a security context for Jenkins"
-  type        = bool
-  default     = true
-}
-
-variable "pod_security_policy_enabled" {
-  description = "Enable Pod Security Policy"
-  type        = bool
-  default     = false
-}
-
-variable "network_policy_enabled" {
-  description = "Enable a Network Policy for Jenkins"
-  type        = bool
-  default     = false
-}
-
 # Monitoring
 variable "enable_prometheus_monitoring" {
   description = "Enable Prometheus monitoring"
   type        = bool
   default     = true
-}
-
-variable "prometheus_scrape_interval" {
-  description = "Prometheus scrape interval"
-  type        = string
-  default     = "30s"
 }
 
 # Backup
@@ -349,17 +325,6 @@ variable "backup_schedule" {
   default     = "0 2 * * *"
 }
 
-variable "backup_retention_days" {
-  description = "Number of days to keep backups"
-  type        = number
-  default     = 30
-
-  validation {
-    condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
-    error_message = "Backup retention must be between 1 and 365 days."
-  }
-}
-
 # Tags
 variable "tags" {
   description = "Tags for resources"
@@ -371,46 +336,12 @@ variable "tags" {
 }
 
 # Extra settings
-variable "timezone" {
-  description = "Time zone for Jenkins"
-  type        = string
-  default     = "UTC"
-}
-
 variable "java_opts" {
   description = "Extra Java options for Jenkins"
   type        = string
   default     = "-Xmx2g -Xms1g"
 }
 
-variable "jenkins_opts" {
-  description = "Extra Jenkins options"
-  type        = string
-  default     = ""
-}
-
-variable "enable_csrf_protection" {
-  description = "Enable CSRF protection"
-  type        = bool
-  default     = true
-}
-
-variable "enable_script_security" {
-  description = "Enable script security"
-  type        = bool
-  default     = true
-}
-
-variable "agent_connection_timeout" {
-  description = "Timeout for agent connections (seconds)"
-  type        = number
-  default     = 100
-
-  validation {
-    condition     = var.agent_connection_timeout >= 30 && var.agent_connection_timeout <= 300
-    error_message = "Agent connection timeout must be between 30 and 300 seconds."
-  }
-}
 # IRSA for Jenkins build agents
 variable "oidc_provider_arn" {
   description = "ARN of the EKS cluster OIDC provider (module.eks.oidc_provider_arn)"

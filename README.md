@@ -75,6 +75,7 @@ Checkov findings went from **33 to 0**: 18 fixed in code, 15 skipped with a writ
 | #18 | Remaining findings skipped with reasons, CI scan blocking | Accepted risks are documented, not hidden; new findings now fail the build | 15 skips |
 | #21 | RDS master password managed by Secrets Manager (`manage_master_user_password`) | The password is generated and rotated by AWS and never appears in variables, plans or Terraform state | |
 | #23 | One Django folder; secret key, debug and database settings from environment variables; health and readiness endpoints | The image build referenced a missing folder, the secret key and `DEBUG = True` were hardcoded, and the Kubernetes probes pointed to URLs that did not exist | |
+| #24 | GitHub Actions pinned to commit SHAs (kept current by Dependabot), tflint in CI, 55 unused variables removed | A moved tag cannot change what CI runs. Variables such as `enable_csrf_protection` were accepted but did nothing, which gave a false sense of security | |
 
 Other defaults:
 
@@ -129,12 +130,13 @@ Run the same checks as CI locally:
 terraform fmt -check -recursive
 terraform init -backend=false && terraform validate
 checkov -d . --framework terraform --compact --quiet
+tflint --init && tflint --recursive
 ```
 
 ## Project structure
 
 ```
-├── .github/workflows/terraform.yml   # fmt, validate, Checkov
+├── .github/workflows/terraform.yml   # fmt, validate, Checkov, tflint
 ├── bootstrap/                        # one-time S3 + DynamoDB for remote state
 ├── main.tf                           # wires all modules together
 ├── variables.tf                      # root input variables

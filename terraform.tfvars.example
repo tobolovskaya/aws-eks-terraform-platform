@@ -130,19 +130,13 @@ jenkins_hpa_target_memory_utilization = 80
 
 # Jenkins monitoring
 jenkins_enable_prometheus_monitoring = true
-jenkins_prometheus_scrape_interval = "30s"
 
 # Jenkins backup
 jenkins_enable_backup = false
 jenkins_backup_schedule = "0 2 * * *"
-jenkins_backup_retention_days = 30
 
 # Jenkins extra settings
-jenkins_timezone = "Europe/Kiev"
 jenkins_java_opts = "-Xmx2g -Xms1g"
-jenkins_enable_csrf_protection = true
-jenkins_enable_script_security = true
-jenkins_agent_connection_timeout = 100
 
 # Argo CD settings
 argocd_release_name = "argocd"
@@ -214,12 +208,8 @@ argocd_hpa_target_memory_utilization = 80
 
 # Argo CD monitoring
 argocd_enable_prometheus_monitoring = true
-argocd_prometheus_scrape_interval = "30s"
 
 # Argo CD backup
-argocd_enable_backup = false
-argocd_backup_schedule = "0 2 * * *"
-argocd_backup_retention_days = 30
 
 # Argo CD GitOps
 argocd_create_demo_application = false
@@ -236,14 +226,7 @@ argocd_app_project_admin_groups = []
 argocd_app_project_developer_groups = []
 
 # Argo CD extra settings
-argocd_timezone = "Europe/Kiev"
-argocd_log_level = "info"
-argocd_log_format = "text"
-argocd_sync_timeout = 300
-argocd_self_heal_timeout = 5
 argocd_enable_webhooks = true
-argocd_webhook_github_secret = ""
-argocd_webhook_gitlab_secret = ""
 
 # Monitoring settings
 grafana_admin_password = "secure-grafana-password"  # CHANGE TO A STRONG PASSWORD!
