@@ -176,4 +176,4 @@ terraform test                        # security tests, mocked providers, no AWS
 ---
 
 Built during my MSc in Computer Science (Woolf / GoIT Neoversity, 2026) and hardened afterwards.
-**Yevheniia Tobolovska** · IT operations and security · [Portfolio](https://my-portfolio-yevheniia-tobolovskas-projects.vercel.app/) · [LinkedIn](https://www.linkedin.com/in/yevheniia-tobolovska)
+**Yevheniia Tobolovska** · IT operations and security · [Portfolio](https://tobolovska.no) · [LinkedIn](https://www.linkedin.com/in/yevheniia-tobolovska)
