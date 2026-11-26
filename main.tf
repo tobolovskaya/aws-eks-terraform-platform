@@ -152,11 +152,11 @@ module "jenkins" {
   enable_prometheus_monitoring = var.jenkins_enable_prometheus_monitoring
 
   # Backup
-  enable_backup         = var.jenkins_enable_backup
-  backup_schedule       = var.jenkins_backup_schedule
+  enable_backup   = var.jenkins_enable_backup
+  backup_schedule = var.jenkins_backup_schedule
 
   # Extra settings
-  java_opts                = var.jenkins_java_opts
+  java_opts = var.jenkins_java_opts
 
   tags = var.common_tags
 
@@ -242,7 +242,7 @@ module "argocd" {
   # Extra settings
 
   # Webhooks
-  enable_webhooks       = var.argocd_enable_webhooks
+  enable_webhooks = var.argocd_enable_webhooks
 
 
   depends_on = [
