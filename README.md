@@ -156,7 +156,6 @@ checkov -d . --framework terraform --compact --quiet
 - **Check existing code against the official documentation.** The old node script called `bootstrap.sh` itself, which AWS says not to do for managed node groups, and it piped `curl` into `bash` on every node.
 - **Small pull requests with a clear "why" are easier to review and to roll back** than one large hardening commit.
 - **Use the same tool versions locally and in CI.** My local Checkov and the one in GitHub Actions reported different numbers until I understood why.
--->
 
 ---
 
