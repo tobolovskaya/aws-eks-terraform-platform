@@ -38,10 +38,12 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSVPCResourceControlle
 # Security Group для EKS кластера
 resource "aws_security_group" "cluster" {
   name_prefix = "${var.cluster_name}-cluster-"
+  description = "EKS control plane security group"
   vpc_id      = var.vpc_id
 
   # Вихідний трафік
   egress {
+    description = "Outbound traffic to AWS APIs, ECR and the internet via NAT"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -181,10 +183,12 @@ resource "aws_launch_template" "node_group" {
 # Security Group для node groups
 resource "aws_security_group" "node_group" {
   name_prefix = "${var.cluster_name}-node-group-"
+  description = "EKS worker nodes security group"
   vpc_id      = var.vpc_id
 
   # Вихідний трафік
   egress {
+    description = "Outbound traffic to AWS APIs, ECR and the internet via NAT"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

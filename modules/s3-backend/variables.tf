@@ -138,3 +138,8 @@ variable "tags" {
     Module    = "s3-backend"
   }
 }
+variable "access_logs_retention_days" {
+  description = "How long to keep S3 access logs (days)"
+  type        = number
+  default     = 365
+}

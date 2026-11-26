@@ -25,12 +25,13 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 }
 
 # Налаштування шифрування
+# State can contain secrets (e.g. database passwords), so encrypt it with KMS
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm = "aws:kms"
     }
     bucket_key_enabled = true
   }
@@ -146,6 +147,31 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
+    }
+  }
+}
+
+# Keep access logs for a year, then delete them
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  count  = var.enable_access_logging ? 1 : 0
+  bucket = aws_s3_bucket.access_logs[0].id
+
+  rule {
+    id     = "expire-access-logs"
+    status = "Enabled"
+
+    filter {}
+
+    expiration {
+      days = var.access_logs_retention_days
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }
