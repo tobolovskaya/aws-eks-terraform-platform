@@ -131,12 +131,14 @@ resource "aws_db_subnet_group" "main" {
 # Security Group для бази даних
 resource "aws_security_group" "db" {
   name_prefix = "${var.tags.Project}-db-"
+  description = "Database: inbound only from allowed sources, no outbound"
   vpc_id      = var.vpc_id
 
   # Вхідні правила для CIDR блоків
   dynamic "ingress" {
     for_each = length(var.allowed_cidr_blocks) > 0 ? [1] : []
     content {
+      description = "Database port from allowed CIDR blocks"
       from_port   = local.default_port
       to_port     = local.default_port
       protocol    = "tcp"
@@ -148,6 +150,7 @@ resource "aws_security_group" "db" {
   dynamic "ingress" {
     for_each = var.allowed_security_groups
     content {
+      description     = "Database port from allowed security groups"
       from_port       = local.default_port
       to_port         = local.default_port
       protocol        = "tcp"
@@ -155,13 +158,8 @@ resource "aws_security_group" "db" {
     }
   }
 
-  # Вихідні правила
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # No egress rules: the database only answers connections (security groups are stateful).
+  # Terraform removes the default allow-all egress rule that AWS creates.
 
   tags = merge(var.tags, {
     Name = "${var.tags.Project}-db-security-group"

@@ -507,7 +507,7 @@ variable "ecr_repository_name" {
 variable "ecr_image_tag_mutability" {
   description = "Можливість змінювати теги образів"
   type        = string
-  default     = "MUTABLE"
+  default     = "IMMUTABLE"
 }
 
 variable "ecr_scan_on_push" {
@@ -525,7 +525,7 @@ variable "ecr_enable_registry_scanning" {
 variable "ecr_encryption_type" {
   description = "Тип шифрування ECR"
   type        = string
-  default     = "AES256"
+  default     = "KMS"
 }
 
 variable "ecr_kms_key" {

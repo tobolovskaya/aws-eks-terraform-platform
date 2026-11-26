@@ -41,3 +41,14 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+variable "enable_flow_logs" {
+  description = "Send VPC flow logs to an encrypted CloudWatch log group"
+  type        = bool
+  default     = true
+}
+
+variable "flow_logs_retention_days" {
+  description = "How long to keep VPC flow logs (days)"
+  type        = number
+  default     = 365
+}

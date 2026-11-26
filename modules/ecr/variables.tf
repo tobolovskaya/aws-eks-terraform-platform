@@ -14,7 +14,7 @@ variable "repository_name" {
 variable "image_tag_mutability" {
   description = "Можливість змінювати теги образів (MUTABLE або IMMUTABLE)"
   type        = string
-  default     = "MUTABLE"
+  default     = "IMMUTABLE"
 
   validation {
     condition     = contains(["MUTABLE", "IMMUTABLE"], var.image_tag_mutability)
@@ -60,7 +60,7 @@ variable "registry_scan_filters" {
 variable "encryption_type" {
   description = "Тип шифрування (AES256 або KMS)"
   type        = string
-  default     = "AES256"
+  default     = "KMS"
 
   validation {
     condition     = contains(["AES256", "KMS"], var.encryption_type)
