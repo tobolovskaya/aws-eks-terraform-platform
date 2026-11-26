@@ -79,7 +79,6 @@ resource "aws_ecr_repository_policy" "main" {
           "ecr:DescribeRepositories",
           "ecr:ListImages",
           "ecr:DescribeImages",
-          "ecr:BatchDeleteImage",
           "ecr:GetLifecyclePolicy",
           "ecr:GetLifecyclePolicyPreview",
           "ecr:ListTagsForResource",
