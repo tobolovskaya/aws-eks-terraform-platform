@@ -136,7 +136,10 @@ checkov -d . --framework terraform --compact --quiet
 ├── .github/workflows/terraform.yml   # fmt, validate, Checkov
 ├── bootstrap/                        # one-time S3 + DynamoDB for remote state
 ├── main.tf                           # wires all modules together
-├── backend.tf                        # remote state configuration
+├── variables.tf                      # root input variables
+├── providers.tf                      # AWS, Kubernetes and Helm providers
+├── versions.tf                       # Terraform and provider versions
+├── backend.tf                        # remote state (eu-north-1, Stockholm)
 ├── outputs.tf
 ├── terraform.tfvars.example          # placeholders only
 ├── modules/

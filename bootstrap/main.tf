@@ -51,7 +51,7 @@ module "s3_backend" {
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "us-west-2"
+  default     = "eu-north-1"
 }
 
 variable "backend_bucket_name" {
