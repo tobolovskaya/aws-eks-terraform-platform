@@ -168,6 +168,9 @@ terraform test                        # security tests, mocked providers, no AWS
 - **Security fixes have dependencies.** IMDS hop limit 1 was only safe after I confirmed the EBS CSI driver used its own IRSA role. The Kubernetes upgrade also meant moving nodes from Amazon Linux 2 to AL2023, because AWS no longer builds AL2 images for 1.33 and later.
 - **Check existing code against the official documentation.** The old node script called `bootstrap.sh` itself, which AWS says not to do for managed node groups, and it piped `curl` into `bash` on every node.
 - **Small pull requests with a clear "why" are easier to review and to roll back** than one large hardening commit.
+- **Tests catch what scanners and reviews miss.** Checkov passed and every PR was reviewed, yet node groups received an empty subnet list and `apply` would have failed. The first run of `terraform test` with mocked providers found it, without an AWS account.
+- **A setting that does nothing is worse than no setting.** tflint showed that variables such as `enable_csrf_protection` were accepted but never used. They looked like protection in the config and protected nothing.
+- **Look at the whole path, not only the infrastructure.** The Django image was built from a folder without the app code, and the Kubernetes probes pointed to URLs that did not exist. Neither showed up in Terraform scans.
 - **Use the same tool versions locally and in CI.** My local Checkov and the one in GitHub Actions reported different numbers until I understood why.
 
 ---
