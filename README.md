@@ -73,6 +73,7 @@ Checkov findings went from **33 to 0**: 18 fixed in code, 15 skipped with a writ
 | [#16](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/16) | Jenkins builds images with Kaniko, `docker.sock` removed | A mounted Docker socket gives a build root on the node | |
 | [#17](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/17) | Immutable, KMS-encrypted ECR; locked default SG; VPC flow logs; SG descriptions; no DB egress; KMS for state | Tags cannot be overwritten, traffic is logged for incident response, least privilege on the network | CKV_AWS_51, 136, 145, 23, 382, CKV2_AWS_11, 12, 61 |
 | #18 | Remaining findings skipped with reasons, CI scan blocking | Accepted risks are documented, not hidden; new findings now fail the build | 15 skips |
+| #21 | RDS master password managed by Secrets Manager (`manage_master_user_password`) | The password is generated and rotated by AWS and never appears in variables, plans or Terraform state | |
 
 Other defaults:
 

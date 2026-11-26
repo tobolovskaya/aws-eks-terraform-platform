@@ -53,6 +53,11 @@ output "parameter_group_name" {
   value       = module.rds.parameter_group_name
 }
 
+output "db_master_user_secret_arn" {
+  description = "Secrets Manager ARN with the database master password"
+  value       = module.rds.master_user_secret_arn
+}
+
 # EKS outputs
 output "eks_cluster_id" {
   description = "EKS cluster ID"

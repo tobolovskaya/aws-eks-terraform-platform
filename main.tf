@@ -1,6 +1,6 @@
 # Root file that wires the modules together
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.5"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -43,7 +43,6 @@ module "rds" {
   # Database parameters
   database_name = var.database_name
   username      = var.db_username
-  password      = var.db_password
 
   # Extra settings
   multi_az                = var.multi_az
@@ -406,12 +405,6 @@ variable "db_username" {
   description = "Database username"
   type        = string
   default     = "dbadmin"
-}
-
-variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true
 }
 
 variable "multi_az" {

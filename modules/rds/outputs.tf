@@ -107,13 +107,21 @@ output "monitoring_role_arn" {
 
 # Connection
 output "connection_string" {
-  description = "Database connection string"
+  description = "Database connection string without the password (read it from master_user_secret_arn)"
   value = var.use_aurora ? (
     length(aws_rds_cluster.main) > 0 ?
-    "postgresql://${var.username}:${var.password}@${aws_rds_cluster.main[0].endpoint}:${local.default_port}/${var.database_name}" : null
+    "${local.url_scheme}://${var.username}@${aws_rds_cluster.main[0].endpoint}:${local.default_port}/${var.database_name}" : null
     ) : (
     length(aws_db_instance.main) > 0 ?
-    "${local.aurora_engine}://${var.username}:${var.password}@${aws_db_instance.main[0].endpoint}:${local.default_port}/${var.database_name}" : null
+    "${local.url_scheme}://${var.username}@${aws_db_instance.main[0].endpoint}:${local.default_port}/${var.database_name}" : null
   )
-  sensitive = true
+}
+
+output "master_user_secret_arn" {
+  description = "ARN of the Secrets Manager secret with the master password"
+  value = var.use_aurora ? (
+    length(aws_rds_cluster.main) > 0 ? aws_rds_cluster.main[0].master_user_secret[0].secret_arn : null
+    ) : (
+    length(aws_db_instance.main) > 0 ? aws_db_instance.main[0].master_user_secret[0].secret_arn : null
+  )
 }

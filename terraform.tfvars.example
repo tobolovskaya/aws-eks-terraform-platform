@@ -19,7 +19,6 @@ db_instance_class = "db.t3.micro"
 # Database
 database_name = "myapp"
 db_username = "dbadmin"
-db_password = "your-secure-password-here"  # CHANGE TO A STRONG PASSWORD!
 
 # Extra settings
 multi_az = false

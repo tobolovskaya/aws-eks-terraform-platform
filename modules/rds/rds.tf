@@ -15,7 +15,8 @@ resource "aws_db_instance" "main" {
   # Database
   db_name  = var.database_name
   username = var.username
-  password = var.password
+  # Password lives in Secrets Manager, managed and rotated by RDS
+  manage_master_user_password = true
   port     = local.default_port
 
   # Storage

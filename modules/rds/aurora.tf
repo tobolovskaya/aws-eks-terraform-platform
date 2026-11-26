@@ -13,7 +13,9 @@ resource "aws_rds_cluster" "main" {
   # Database
   database_name   = var.database_name
   master_username = var.username
-  master_password = var.password
+  # RDS creates the password and keeps it in Secrets Manager with rotation,
+  # so it never appears in Terraform variables, plans or state.
+  manage_master_user_password = true
   port            = local.default_port
 
   # Network and security
@@ -55,7 +57,6 @@ resource "aws_rds_cluster" "main" {
 
   lifecycle {
     ignore_changes = [
-      master_password,
       final_snapshot_identifier
     ]
   }
