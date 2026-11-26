@@ -1,55 +1,55 @@
-# Виведення інформації про S3 та DynamoDB
+# S3 and DynamoDB outputs
 
-# S3 виводи
+# S3 outputs
 output "s3_bucket_id" {
-  description = "ID S3 бакета"
+  description = "S3 bucket ID"
   value       = aws_s3_bucket.terraform_state.id
 }
 
 output "s3_bucket_arn" {
-  description = "ARN S3 бакета"
+  description = "S3 bucket ARN"
   value       = aws_s3_bucket.terraform_state.arn
 }
 
 output "s3_bucket_domain_name" {
-  description = "Domain name S3 бакета"
+  description = "S3 bucket domain name"
   value       = aws_s3_bucket.terraform_state.bucket_domain_name
 }
 
 output "s3_bucket_regional_domain_name" {
-  description = "Regional domain name S3 бакета"
+  description = "S3 bucket regional domain name"
   value       = aws_s3_bucket.terraform_state.bucket_regional_domain_name
 }
 
 output "s3_bucket_region" {
-  description = "Регіон S3 бакета"
+  description = "S3 bucket region"
   value       = aws_s3_bucket.terraform_state.region
 }
 
-# DynamoDB виводи
+# DynamoDB outputs
 output "dynamodb_table_id" {
-  description = "ID DynamoDB таблиці"
+  description = "DynamoDB table ID"
   value       = aws_dynamodb_table.terraform_state_lock.id
 }
 
 output "dynamodb_table_arn" {
-  description = "ARN DynamoDB таблиці"
+  description = "DynamoDB table ARN"
   value       = aws_dynamodb_table.terraform_state_lock.arn
 }
 
 output "dynamodb_table_name" {
-  description = "Назва DynamoDB таблиці"
+  description = "DynamoDB table name"
   value       = aws_dynamodb_table.terraform_state_lock.name
 }
 
 output "dynamodb_table_stream_arn" {
-  description = "ARN DynamoDB stream (якщо увімкнено)"
+  description = "DynamoDB stream ARN (if enabled)"
   value       = aws_dynamodb_table.terraform_state_lock.stream_arn
 }
 
-# Конфігурація для backend
+# Backend configuration
 output "terraform_backend_config" {
-  description = "Конфігурація для terraform backend"
+  description = "Configuration for the Terraform backend"
   value = {
     bucket         = aws_s3_bucket.terraform_state.id
     key            = "terraform/state"
@@ -59,9 +59,9 @@ output "terraform_backend_config" {
   }
 }
 
-# Готовий блок backend для копіювання
+# Ready-to-copy backend block
 output "backend_configuration" {
-  description = "Готова конфігурація backend для вставки в terraform блок"
+  description = "Ready backend configuration to paste into the terraform block"
   value       = <<-EOT
     terraform {
       backend "s3" {
@@ -75,30 +75,30 @@ output "backend_configuration" {
   EOT
 }
 
-# Логування (якщо увімкнено)
+# Logging (if enabled)
 output "access_logs_bucket_id" {
-  description = "ID бакета для логів доступу"
+  description = "ID of the access log bucket"
   value       = var.enable_access_logging ? aws_s3_bucket.access_logs[0].id : null
 }
 
-# Auto Scaling виводи
+# Auto Scaling outputs
 output "autoscaling_read_target_arn" {
-  description = "ARN цілі автоскейлінгу для читання"
+  description = "ARN of the read autoscaling target"
   value       = var.dynamodb_billing_mode == "PROVISIONED" && var.enable_dynamodb_autoscaling ? aws_appautoscaling_target.dynamodb_table_read_target[0].arn : null
 }
 
 output "autoscaling_write_target_arn" {
-  description = "ARN цілі автоскейлінгу для запису"
+  description = "ARN of the write autoscaling target"
   value       = var.dynamodb_billing_mode == "PROVISIONED" && var.enable_dynamodb_autoscaling ? aws_appautoscaling_target.dynamodb_table_write_target[0].arn : null
 }
 
-# CloudWatch алерти
+# CloudWatch alarms
 output "read_throttle_alarm_arn" {
-  description = "ARN алерту для read throttle"
+  description = "ARN of the read throttle alarm"
   value       = var.enable_cloudwatch_alarms ? aws_cloudwatch_metric_alarm.dynamodb_read_throttle[0].arn : null
 }
 
 output "write_throttle_alarm_arn" {
-  description = "ARN алерту для write throttle"
+  description = "ARN of the write throttle alarm"
   value       = var.enable_cloudwatch_alarms ? aws_cloudwatch_metric_alarm.dynamodb_write_throttle[0].arn : null
 }

@@ -1,4 +1,4 @@
-# Створення VPC, підмереж, Internet Gateway
+# Create the VPC, subnets and Internet Gateway
 
 # VPC
 resource "aws_vpc" "main" {
@@ -20,7 +20,7 @@ resource "aws_internet_gateway" "main" {
   })
 }
 
-# Публічні підмережі
+# Public subnets
 resource "aws_subnet" "public" {
   #checkov:skip=CKV_AWS_130: public subnets only host NAT gateways and load balancers, which need public IPs
   count = length(var.public_subnet_cidrs)
@@ -36,7 +36,7 @@ resource "aws_subnet" "public" {
   })
 }
 
-# Приватні підмережі
+# Private subnets
 resource "aws_subnet" "private" {
   count = length(var.private_subnet_cidrs)
 

@@ -1,27 +1,27 @@
 # Argo CD Helm Chart Values
-# Базова конфігурація для Argo CD
+# Base configuration for Argo CD
 
 global:
-  # Загальні налаштування
+  # General settings
   image:
     repository: quay.io/argoproj/argocd
     tag: "v2.9.3"
     imagePullPolicy: IfNotPresent
   
-  # Домен для Argo CD
+  # Domain for Argo CD
   domain: argocd.local
   
-  # Додаткові labels
+  # Extra labels
   additionalLabels:
     app.kubernetes.io/part-of: argocd
 
-# Argo CD Server налаштування
+# Argo CD Server settings
 server:
-  # Основні налаштування
+  # Basic settings
   name: server
   replicas: 1
   
-  # Ресурси (будуть перевизначені через Terraform)
+  # Resources (overridden by Terraform)
   resources:
     requests:
       cpu: 100m
@@ -30,7 +30,7 @@ server:
       cpu: 500m
       memory: 512Mi
   
-  # Автоскейлінг
+  # Autoscaling
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -38,13 +38,13 @@ server:
     targetCPUUtilizationPercentage: 50
     targetMemoryUtilizationPercentage: 50
   
-  # Налаштування сервісу
+  # Service settings
   service:
     type: ClusterIP
     port: 80
     portName: http
   
-  # Ingress налаштування
+  # Ingress settings
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -58,16 +58,16 @@ server:
         hosts:
           - argocd.local
   
-  # Додаткові аргументи
+  # Extra arguments
   extraArgs:
-    - --insecure  # Для розробки, видаліть для продакшну
+    - --insecure  # For development, remove in production
   
-  # Конфігурація
+  # Configuration
   config:
-    # URL для Argo CD
+    # URL for Argo CD
     url: https://argocd.local
     
-    # OIDC конфігурація (опціонально)
+    # OIDC configuration (optional)
     oidc.config: |
       name: OIDC
       issuer: https://your-oidc-provider.com
@@ -76,7 +76,7 @@ server:
       requestedScopes: ["openid", "profile", "email", "groups"]
       requestedIDTokenClaims: {"groups": {"essential": true}}
     
-    # Repositories конфігурація
+    # Repositories configuration
     repositories: |
       - type: git
         url: https://github.com/argoproj/argocd-example-apps
@@ -92,7 +92,7 @@ server:
           hs.status = "Healthy"
           return hs
   
-  # RBAC конфігурація
+  # RBAC configuration
   rbacConfig:
     policy.default: role:readonly
     policy.csv: |
@@ -101,12 +101,12 @@ server:
       p, role:admin, repositories, *, *, allow
       g, argocd-admins, role:admin
 
-# Application Controller налаштування
+# Application Controller settings
 controller:
   name: application-controller
   replicas: 1
   
-  # Ресурси (будуть перевизначені через Terraform)
+  # Resources (overridden by Terraform)
   resources:
     requests:
       cpu: 250m
@@ -115,7 +115,7 @@ controller:
       cpu: 500m
       memory: 2Gi
   
-  # Метрики
+  # Metrics
   metrics:
     enabled: true
     service:
@@ -126,18 +126,18 @@ controller:
       enabled: true
       interval: 30s
   
-  # Додаткові аргументи
+  # Extra arguments
   extraArgs:
     - --repo-server-timeout-seconds=60
     - --status-processors=20
     - --operation-processors=10
 
-# Repo Server налаштування
+# Repo Server settings
 repoServer:
   name: repo-server
   replicas: 1
   
-  # Ресурси (будуть перевизначені через Terraform)
+  # Resources (overridden by Terraform)
   resources:
     requests:
       cpu: 100m
@@ -146,7 +146,7 @@ repoServer:
       cpu: 1
       memory: 1Gi
   
-  # Автоскейлінг
+  # Autoscaling
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -154,7 +154,7 @@ repoServer:
     targetCPUUtilizationPercentage: 50
     targetMemoryUtilizationPercentage: 50
   
-  # Метрики
+  # Metrics
   metrics:
     enabled: true
     service:
@@ -165,7 +165,7 @@ repoServer:
       enabled: true
       interval: 30s
   
-  # Volumes для додаткових інструментів
+  # Volumes for extra tools
   volumes:
     - name: custom-tools
       emptyDir: {}
@@ -174,28 +174,28 @@ repoServer:
     - name: custom-tools
       mountPath: /custom-tools
   
-  # Init контейнери для встановлення додаткових інструментів
+  # Init containers that install extra tools
   initContainers:
     - name: download-tools
       image: alpine/git:latest
       command: [sh, -c]
       args:
         - |
-          # Встановлення додаткових інструментів
+          # Install extra tools
           echo "Installing additional tools..."
-          # Приклад: встановлення kustomize
+          # Example: install kustomize
           # curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           # mv kustomize /custom-tools/
       volumeMounts:
         - name: custom-tools
           mountPath: /custom-tools
 
-# Dex налаштування (OIDC)
+# Dex settings (OIDC)
 dex:
   enabled: false
   name: dex-server
   
-  # Ресурси
+  # Resources
   resources:
     requests:
       cpu: 50m
@@ -204,7 +204,7 @@ dex:
       cpu: 50m
       memory: 128Mi
   
-  # Конфігурація
+  # Configuration
   config:
     issuer: https://argocd.local/api/dex
     storage:
@@ -215,7 +215,7 @@ dex:
       level: info
       format: text
     connectors:
-      # Приклад GitHub connector
+      # Example GitHub connector
       - type: github
         id: github
         name: GitHub
@@ -225,12 +225,12 @@ dex:
           orgs:
             - name: your-github-org
 
-# Redis налаштування
+# Redis settings
 redis:
   enabled: true
   name: redis
   
-  # Ресурси
+  # Resources
   resources:
     requests:
       cpu: 100m
@@ -239,7 +239,7 @@ redis:
       cpu: 200m
       memory: 256Mi
 
-# Redis HA налаштування (для HA режиму)
+# Redis HA settings (for HA mode)
 redis-ha:
   enabled: false
   haproxy:
@@ -258,7 +258,7 @@ applicationSet:
   name: applicationset-controller
   replicas: 1
   
-  # Ресурси
+  # Resources
   resources:
     requests:
       cpu: 100m
@@ -267,7 +267,7 @@ applicationSet:
       cpu: 500m
       memory: 512Mi
   
-  # Метрики
+  # Metrics
   metrics:
     enabled: true
     service:
@@ -283,7 +283,7 @@ notifications:
   enabled: true
   name: notifications-controller
   
-  # Ресурси
+  # Resources
   resources:
     requests:
       cpu: 100m
@@ -292,7 +292,7 @@ notifications:
       cpu: 500m
       memory: 512Mi
   
-  # Метрики
+  # Metrics
   metrics:
     enabled: true
     service:
@@ -303,7 +303,7 @@ notifications:
       enabled: true
       interval: 30s
   
-  # Конфігурація нотифікацій
+  # Notifications configuration
   notifiers:
     service.slack: |
       token: $slack-token
@@ -314,7 +314,7 @@ notifications:
       port: 587
       from: $email-username
   
-  # Шаблони нотифікацій
+  # Notification templates
   templates:
     template.app-deployed: |
       email:
@@ -355,7 +355,7 @@ notifications:
             ]
           }]
   
-  # Тригери нотифікацій
+  # Notification triggers
   triggers:
     trigger.on-deployed: |
       - description: Application is synced and healthy
@@ -373,33 +373,33 @@ notifications:
         - app-sync-failed
         when: app.status.operationState.phase in ['Error', 'Failed']
 
-# Конфігурації
+# Configs
 configs:
-  # Параметри командного рядка
+  # Command-line parameters
   params:
     server.insecure: false
     server.rootpath: ""
     server.grpc.web: true
     server.disable.auth: false
     
-    # Controller параметри
+    # Controller parameters
     controller.status.processors: 20
     controller.operation.processors: 10
     controller.self.heal.timeout.seconds: 5
     controller.repo.server.timeout.seconds: 60
     
-    # Repo server параметри
+    # Repo server parameters
     reposerver.parallelism.limit: 0
   
-  # Secret з паролем адміністратора
+  # Secret with the admin password
   secret:
     createSecret: true
-    argocdServerAdminPassword: ""  # Буде встановлено через Terraform
+    argocdServerAdminPassword: ""  # Set by Terraform
     argocdServerAdminPasswordMtime: "2023-01-01T00:00:00Z"
   
-  # Конфігурація репозиторіїв
+  # Repository configuration
   repositories:
-    # Приклад приватного репозиторію
+    # Example private repository
     # private-repo:
     #   url: https://github.com/private/repo
     #   passwordSecret:
@@ -409,14 +409,14 @@ configs:
     #     name: private-repo-secret
     #     key: username
   
-  # Конфігурація кластерів
+  # Cluster configuration
   clusters:
-    # Локальний кластер
+    # Local cluster
     https://kubernetes.default.svc:
       tlsClientConfig:
         insecure: false
 
-# Глобальні налаштування безпеки
+# Global security settings
 securityContext:
   runAsNonRoot: true
   runAsUser: 999
@@ -428,7 +428,7 @@ networkPolicy:
   create: false
   defaultDenyIngress: false
 
-# Service Monitor для Prometheus
+# Service Monitor for Prometheus
 serviceMonitor:
   enabled: true
   interval: 30s
@@ -437,7 +437,7 @@ serviceMonitor:
   namespace: ""
   additionalLabels: {}
 
-# Додаткові ресурси
+# Extra resources
 extraObjects: []
   # - apiVersion: v1
   #   kind: Secret
@@ -446,6 +446,6 @@ extraObjects: []
   #   stringData:
   #     slack-token: your-slack-token
 
-# Створення CRDs
+# Create CRDs
 createAggregateRoles: true
 createClusterRoles: true

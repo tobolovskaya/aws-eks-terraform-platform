@@ -1,50 +1,50 @@
-# Виведення інформації про EKS кластер
+# EKS cluster outputs
 
-# Основна інформація про кластер
+# Basic cluster information
 output "cluster_id" {
-  description = "ID EKS кластера"
+  description = "EKS cluster ID"
   value       = aws_eks_cluster.main.id
 }
 
 output "cluster_name" {
-  description = "Назва EKS кластера"
+  description = "EKS cluster name"
   value       = aws_eks_cluster.main.name
 }
 
 output "cluster_arn" {
-  description = "ARN EKS кластера"
+  description = "EKS cluster ARN"
   value       = aws_eks_cluster.main.arn
 }
 
 output "cluster_endpoint" {
-  description = "Endpoint EKS кластера"
+  description = "EKS cluster endpoint"
   value       = aws_eks_cluster.main.endpoint
 }
 
 output "cluster_version" {
-  description = "Версія Kubernetes кластера"
+  description = "Cluster Kubernetes version"
   value       = aws_eks_cluster.main.version
 }
 
 output "cluster_platform_version" {
-  description = "Версія платформи EKS"
+  description = "EKS platform version"
   value       = aws_eks_cluster.main.platform_version
 }
 
 output "cluster_status" {
-  description = "Статус EKS кластера"
+  description = "EKS cluster status"
   value       = aws_eks_cluster.main.status
 }
 
-# Сертифікат кластера
+# Cluster certificate
 output "cluster_certificate_authority_data" {
-  description = "Base64 encoded certificate data для підключення до кластера"
+  description = "Base64-encoded certificate data to connect to the cluster"
   value       = aws_eks_cluster.main.certificate_authority[0].data
 }
 
-# OIDC інформація
+# OIDC information
 output "cluster_oidc_issuer_url" {
-  description = "URL OIDC identity provider для кластера"
+  description = "OIDC identity provider URL for the cluster"
   value       = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
 
@@ -55,34 +55,34 @@ output "oidc_provider_arn" {
 
 # Security Groups
 output "cluster_security_group_id" {
-  description = "ID Security Group кластера"
+  description = "Cluster security group ID"
   value       = aws_security_group.cluster.id
 }
 
 output "node_security_group_id" {
-  description = "ID Security Group для node groups"
+  description = "Security group ID for node groups"
   value       = aws_security_group.node_group.id
 }
 
-# IAM ролі
+# IAM roles
 output "cluster_iam_role_arn" {
-  description = "ARN IAM ролі кластера"
+  description = "Cluster IAM role ARN"
   value       = aws_iam_role.cluster.arn
 }
 
 output "node_group_iam_role_arn" {
-  description = "ARN IAM ролі node groups"
+  description = "Node group IAM role ARN"
   value       = aws_iam_role.node_group.arn
 }
 
 output "ebs_csi_driver_iam_role_arn" {
-  description = "ARN IAM ролі EBS CSI Driver"
+  description = "EBS CSI Driver IAM role ARN"
   value       = var.enable_ebs_csi_driver ? aws_iam_role.ebs_csi_driver[0].arn : null
 }
 
-# Node Groups інформація
+# Node groups information
 output "node_groups" {
-  description = "Інформація про node groups"
+  description = "Node group information"
   value = {
     for ng in aws_eks_node_group.main : ng.node_group_name => {
       arn            = ng.arn
@@ -98,25 +98,25 @@ output "node_groups" {
   }
 }
 
-# Add-ons інформація
+# Add-ons information
 output "ebs_csi_addon_arn" {
   description = "ARN EBS CSI Driver addon"
   value       = var.enable_ebs_csi_driver ? aws_eks_addon.ebs_csi_driver[0].arn : null
 }
 
 output "ebs_csi_addon_status" {
-  description = "Статус EBS CSI Driver addon"
+  description = "EBS CSI Driver add-on status"
   value       = var.enable_ebs_csi_driver ? aws_eks_addon.ebs_csi_driver[0].addon_version : null
 }
 
-# Команди для підключення
+# Connection commands
 output "kubectl_config_command" {
-  description = "Команда для налаштування kubectl"
+  description = "Command to configure kubectl"
   value       = "aws eks update-kubeconfig --region ${data.aws_region.current.name} --name ${aws_eks_cluster.main.name}"
 }
 
 output "kubeconfig" {
-  description = "Конфігурація kubeconfig для підключення до кластера"
+  description = "kubeconfig to connect to the cluster"
   value = {
     apiVersion = "v1"
     kind       = "Config"
@@ -158,24 +158,24 @@ output "kubeconfig" {
 
 # CloudWatch Log Group
 output "cloudwatch_log_group_name" {
-  description = "Назва CloudWatch Log Group для кластера"
+  description = "CloudWatch log group name for the cluster"
   value       = "/aws/eks/${aws_eks_cluster.main.name}/cluster"
 }
 
-# Мережева інформація
+# Network information
 output "vpc_id" {
-  description = "ID VPC кластера"
+  description = "Cluster VPC ID"
   value       = var.vpc_id
 }
 
 output "subnet_ids" {
-  description = "ID підмереж кластера"
+  description = "Cluster subnet IDs"
   value       = var.subnet_ids
 }
 
-# Корисна інформація для CI/CD
+# Useful information for CI/CD
 output "cluster_info" {
-  description = "Загальна інформація про кластер для використання в CI/CD"
+  description = "General cluster information for use in CI/CD"
   value = {
     name                  = aws_eks_cluster.main.name
     endpoint              = aws_eks_cluster.main.endpoint
@@ -186,9 +186,9 @@ output "cluster_info" {
   sensitive = true
 }
 
-# Helm values для різних чартів
+# Helm values for different charts
 output "helm_values" {
-  description = "Значення для використання в Helm чартах"
+  description = "Values for use in Helm charts"
   value = {
     cluster = {
       name     = aws_eks_cluster.main.name

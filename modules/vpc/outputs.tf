@@ -1,4 +1,4 @@
-# Виведення інформації про VPC
+# VPC outputs
 
 output "vpc_id" {
   description = "ID VPC"
@@ -6,7 +6,7 @@ output "vpc_id" {
 }
 
 output "vpc_cidr_block" {
-  description = "CIDR блок VPC"
+  description = "VPC CIDR block"
   value       = aws_vpc.main.cidr_block
 }
 
@@ -16,22 +16,22 @@ output "internet_gateway_id" {
 }
 
 output "public_subnet_ids" {
-  description = "ID публічних підмереж"
+  description = "Public subnet IDs"
   value       = aws_subnet.public[*].id
 }
 
 output "private_subnet_ids" {
-  description = "ID приватних підмереж"
+  description = "Private subnet IDs"
   value       = aws_subnet.private[*].id
 }
 
 output "public_route_table_id" {
-  description = "ID route table для публічних підмереж"
+  description = "Route table ID for public subnets"
   value       = aws_route_table.public.id
 }
 
 output "private_route_table_ids" {
-  description = "ID route tables для приватних підмереж"
+  description = "Route table IDs for private subnets"
   value       = aws_route_table.private[*].id
 }
 

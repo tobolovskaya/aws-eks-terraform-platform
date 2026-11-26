@@ -1,15 +1,15 @@
-# Створення ECR репозиторію
+# Create the ECR repository
 
 resource "aws_ecr_repository" "main" {
   name                 = var.repository_name
   image_tag_mutability = var.image_tag_mutability
 
-  # Налаштування сканування образів
+  # Image scanning settings
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
   }
 
-  # Шифрування
+  # Encryption
   encryption_configuration {
     encryption_type = var.encryption_type
     kms_key         = var.encryption_type == "KMS" ? var.kms_key : null
@@ -20,7 +20,7 @@ resource "aws_ecr_repository" "main" {
   })
 }
 
-# Політика життєвого циклу для управління образами
+# Lifecycle policy to manage images
 resource "aws_ecr_lifecycle_policy" "main" {
   count      = var.enable_lifecycle_policy ? 1 : 0
   repository = aws_ecr_repository.main.name
@@ -57,7 +57,7 @@ resource "aws_ecr_lifecycle_policy" "main" {
   })
 }
 
-# Політика репозиторію для контролю доступу
+# Repository policy for access control
 resource "aws_ecr_repository_policy" "main" {
   count      = var.enable_cross_account_access ? 1 : 0
   repository = aws_ecr_repository.main.name
@@ -89,7 +89,7 @@ resource "aws_ecr_repository_policy" "main" {
   })
 }
 
-# Реплікація в інші регіони (опціонально)
+# Replication to other regions (optional)
 resource "aws_ecr_replication_configuration" "main" {
   count = length(var.replication_regions) > 0 ? 1 : 0
 
@@ -110,7 +110,7 @@ resource "aws_ecr_replication_configuration" "main" {
   }
 }
 
-# Registry scanning configuration (якщо потрібно)
+# Registry scanning configuration (if needed)
 resource "aws_ecr_registry_scanning_configuration" "main" {
   count     = var.enable_registry_scanning ? 1 : 0
   scan_type = var.registry_scan_type

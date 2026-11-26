@@ -1,6 +1,6 @@
-# Конфігурація для Prometheus + Grafana stack
+# Configuration for the Prometheus + Grafana stack
 
-# Prometheus налаштування
+# Prometheus settings
 prometheus:
   prometheusSpec:
     retention: 30d
@@ -20,16 +20,16 @@ prometheus:
         memory: 2Gi
         cpu: 1
     
-    # Service Monitor селектори
+    # Service Monitor selectors
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     ruleSelectorNilUsesHelmValues: false
 
-# Grafana налаштування
+# Grafana settings
 grafana:
   enabled: true
   
-  # Ресурси
+  # Resources
   resources:
     requests:
       memory: 256Mi
@@ -57,7 +57,7 @@ grafana:
         hosts:
           - grafana.local
   
-  # Додаткові dashboards
+  # Extra dashboards
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -86,7 +86,7 @@ grafana:
         revision: 1
         datasource: Prometheus
 
-# AlertManager налаштування
+# AlertManager settings
 alertmanager:
   alertmanagerSpec:
     storage:

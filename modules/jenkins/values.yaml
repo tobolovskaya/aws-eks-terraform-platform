@@ -1,13 +1,13 @@
 # Jenkins Helm Chart Values
-# Базова конфігурація для Jenkins
+# Base configuration for Jenkins
 
 controller:
-  # Основні налаштування
+  # Basic settings
   image: "jenkins/jenkins"
   tag: "2.426.1-lts"
   imagePullPolicy: "Always"
   
-  # Ресурси (будуть перевизначені через Terraform)
+  # Resources (overridden by Terraform)
   resources:
     requests:
       cpu: "500m"
@@ -16,16 +16,16 @@ controller:
       cpu: "2"
       memory: "4Gi"
   
-  # Java налаштування
+  # Java settings
   javaOpts: "-Xmx2g -Xms1g -Djava.awt.headless=true"
   jenkinsOpts: ""
   
-  # Безпека
+  # Security
   runAsUser: 1000
   fsGroup: 1000
   securityContextCapabilities: {}
   
-  # Налаштування контейнера
+  # Container settings
   containerSecurityContext:
     runAsUser: 1000
     runAsGroup: 1000
@@ -34,11 +34,11 @@ controller:
   
   # Service Account
   serviceAccount:
-    create: false  # Створюється через Terraform
+    create: false  # Created by Terraform
     name: "jenkins-serviceaccount"
     annotations: {}
   
-  # Налаштування сервісу
+  # Service settings
   serviceType: "ClusterIP"
   servicePort: 8080
   targetPort: 8080
@@ -68,7 +68,7 @@ controller:
       timeoutSeconds: 5
       failureThreshold: 3
   
-  # Ingress налаштування
+  # Ingress settings
   ingress:
     enabled: true
     ingressClassName: "nginx"
@@ -90,8 +90,8 @@ controller:
       welcome-message: |
         jenkins:
           systemMessage: |
-            Jenkins налаштований через Configuration as Code.
-            Ласкаво просимо до CI/CD платформи!
+            Jenkins is configured with Configuration as Code.
+            Welcome to the CI/CD platform!
       
       security-settings: |
         jenkins:
@@ -190,7 +190,7 @@ controller:
                         - dockerInstaller:
                             version: "latest"
 
-# Persistence налаштування
+# Persistence settings
 persistence:
   enabled: true
   existingClaim: ""
@@ -200,7 +200,7 @@ persistence:
   volumes: []
   mounts: []
 
-# Agent налаштування
+# Agent settings
 agent:
   enabled: true
   image: "jenkins/inbound-agent"
@@ -209,7 +209,7 @@ agent:
   nodeUsageMode: "NORMAL"
   customJenkinsLabels: []
   
-  # Ресурси для агентів
+  # Resources for agents
   resources:
     requests:
       cpu: "100m"
@@ -218,7 +218,7 @@ agent:
       cpu: "500m"
       memory: "512Mi"
   
-  # Volumes для агентів
+  # Volumes for agents
   volumes:
     - type: HostPath
       hostPath: /var/run/docker.sock
@@ -243,7 +243,7 @@ agent:
         hostPath:
           path: /var/run/docker.sock
 
-# Додаткові налаштування
+# Extra settings
 networkPolicy:
   enabled: false
   internalAgents:
@@ -259,7 +259,7 @@ serviceAccountAgent:
   create: true
   name: "jenkins-agent"
 
-# Backup налаштування
+# Backup settings
 backup:
   enabled: false
   schedule: "0 2 * * *"
@@ -277,7 +277,7 @@ backup:
       cpu: "1"
   env: []
 
-# Prometheus моніторинг
+# Prometheus monitoring
 prometheus:
   enabled: true
   serviceMonitorAdditionalLabels: {}
@@ -289,18 +289,18 @@ prometheus:
   relabelings: []
   metricRelabelings: []
 
-# Додаткові контейнери
+# Extra containers
 additionalContainers: []
 
-# Додаткові volumes
+# Extra volumes
 additionalVolumes: []
 
 # Checksum pod annotation
 checksumConfigMap: true
 
-# Налаштування часового поясу
+# Time zone settings
 timezone: "UTC"
 
-# Налаштування для AWS
+# AWS settings
 awsSecurityGroupPolicies:
   enabled: false

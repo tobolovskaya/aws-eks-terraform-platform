@@ -1,24 +1,24 @@
-# Виведення інформації про Jenkins
+# Jenkins outputs
 
-# Основна інформація
+# Basic information
 output "jenkins_namespace" {
-  description = "Kubernetes namespace де встановлено Jenkins"
+  description = "Kubernetes namespace where Jenkins is installed"
   value       = kubernetes_namespace.jenkins.metadata[0].name
 }
 
 output "jenkins_release_name" {
-  description = "Назва Helm release для Jenkins"
+  description = "Helm release name for Jenkins"
   value       = helm_release.jenkins.name
 }
 
 output "jenkins_chart_version" {
-  description = "Версія Helm chart Jenkins"
+  description = "Jenkins Helm chart version"
   value       = helm_release.jenkins.version
 }
 
-# Доступ до Jenkins
+# Access to Jenkins
 output "jenkins_url" {
-  description = "URL для доступу до Jenkins"
+  description = "URL to access Jenkins"
   value = var.ingress_enabled ? (
     var.ingress_tls_enabled ?
     "https://${var.ingress_hostname}" :
@@ -26,84 +26,84 @@ output "jenkins_url" {
     ) : (
     var.service_type == "LoadBalancer" && var.create_load_balancer_service ?
     "http://${try(kubernetes_service.jenkins_lb[0].status[0].load_balancer[0].ingress[0].hostname, "pending")}" :
-    "http://localhost:8080 (використовуйте kubectl port-forward)"
+    "http://localhost:8080 (use kubectl port-forward)"
   )
 }
 
 output "jenkins_internal_url" {
-  description = "Внутрішній URL Jenkins в кластері"
+  description = "Internal Jenkins URL inside the cluster"
   value       = "http://${helm_release.jenkins.name}-jenkins.${kubernetes_namespace.jenkins.metadata[0].name}.svc.cluster.local:8080"
 }
 
-# Креденшели
+# Credentials
 output "jenkins_admin_user" {
-  description = "Ім'я адміністратора Jenkins"
+  description = "Jenkins admin username"
   value       = var.admin_user
 }
 
 output "jenkins_admin_password" {
-  description = "Пароль адміністратора Jenkins"
+  description = "Jenkins admin password"
   value       = var.admin_password
   sensitive   = true
 }
 
 output "jenkins_admin_secret_name" {
-  description = "Назва Kubernetes secret з паролем адміністратора"
+  description = "Name of the Kubernetes secret with the admin password"
   value       = kubernetes_secret.jenkins_admin.metadata[0].name
 }
 
 # Service Account
 output "jenkins_service_account_name" {
-  description = "Назва Service Account для Jenkins"
+  description = "Service Account name for Jenkins"
   value       = kubernetes_service_account.jenkins.metadata[0].name
 }
 
 output "jenkins_cluster_role_name" {
-  description = "Назва Cluster Role для Jenkins"
+  description = "Cluster Role name for Jenkins"
   value       = kubernetes_cluster_role.jenkins.metadata[0].name
 }
 
-# Сховище
+# Storage
 output "jenkins_pvc_name" {
-  description = "Назва PersistentVolumeClaim для Jenkins"
+  description = "PersistentVolumeClaim name for Jenkins"
   value       = var.create_pvc ? kubernetes_persistent_volume_claim.jenkins_home[0].metadata[0].name : null
 }
 
 output "jenkins_storage_size" {
-  description = "Розмір сховища Jenkins"
+  description = "Jenkins storage size"
   value       = var.storage_size
 }
 
 output "jenkins_storage_class" {
-  description = "Storage class для Jenkins"
+  description = "Storage class for Jenkins"
   value       = var.storage_class
 }
 
-# Мережеві ресурси
+# Network resources
 output "jenkins_service_name" {
-  description = "Назва основного Kubernetes service для Jenkins"
+  description = "Name of the main Kubernetes service for Jenkins"
   value       = "${helm_release.jenkins.name}-jenkins"
 }
 
 output "jenkins_service_type" {
-  description = "Тип Kubernetes service для Jenkins"
+  description = "Kubernetes service type for Jenkins"
   value       = var.service_type
 }
 
 output "jenkins_load_balancer_service_name" {
-  description = "Назва LoadBalancer service (якщо створено)"
+  description = "Name of the LoadBalancer service (if created)"
   value       = var.create_load_balancer_service ? kubernetes_service.jenkins_lb[0].metadata[0].name : null
 }
 
 output "jenkins_load_balancer_hostname" {
-  description = "Hostname LoadBalancer (якщо доступний)"
+  description = "LoadBalancer hostname (if available)"
   value = var.service_type == "LoadBalancer" && var.create_load_balancer_service ? (
     try(kubernetes_service.jenkins_lb[0].status[0].load_balancer[0].ingress[0].hostname, null)
   ) : null
 }
 
 output "jenkins_load_balancer_ip" {
-  description = "IP адреса LoadBalancer (якщо доступна)"
+  description = "LoadBalancer IP address (if available)"
   value = var.service_type == "LoadBalancer" && var.create_load_balancer_service ? (
     try(kubernetes_service.jenkins_lb[0].status[0].load_balancer[0].ingress[0].ip, null)
   ) : null
@@ -111,99 +111,99 @@ output "jenkins_load_balancer_ip" {
 
 # Ingress
 output "jenkins_ingress_name" {
-  description = "Назва Ingress ресурсу (якщо створено)"
+  description = "Name of the Ingress resource (if created)"
   value       = var.create_custom_ingress ? kubernetes_ingress_v1.jenkins[0].metadata[0].name : null
 }
 
 output "jenkins_ingress_hostname" {
-  description = "Hostname для Ingress"
+  description = "Hostname for the Ingress"
   value       = var.ingress_enabled ? var.ingress_hostname : null
 }
 
 output "jenkins_ingress_tls_secret" {
-  description = "Назва TLS secret для Ingress"
+  description = "Name of the TLS secret for the Ingress"
   value       = var.ingress_tls_enabled ? var.ingress_tls_secret_name : null
 }
 
 # Auto Scaling
 output "jenkins_hpa_name" {
-  description = "Назва HorizontalPodAutoscaler (якщо увімкнено)"
+  description = "Name of the HorizontalPodAutoscaler (if enabled)"
   value       = var.enable_hpa ? kubernetes_horizontal_pod_autoscaler_v2.jenkins[0].metadata[0].name : null
 }
 
 output "jenkins_hpa_min_replicas" {
-  description = "Мінімальна кількість реплік HPA"
+  description = "Minimum number of HPA replicas"
   value       = var.enable_hpa ? var.hpa_min_replicas : null
 }
 
 output "jenkins_hpa_max_replicas" {
-  description = "Максимальна кількість реплік HPA"
+  description = "Maximum number of HPA replicas"
   value       = var.enable_hpa ? var.hpa_max_replicas : null
 }
 
-# Команди для доступу
+# Access commands
 output "kubectl_port_forward_command" {
-  description = "Команда для port-forward до Jenkins"
+  description = "Command to port-forward to Jenkins"
   value       = "kubectl port-forward -n ${kubernetes_namespace.jenkins.metadata[0].name} svc/${helm_release.jenkins.name}-jenkins 8080:8080"
 }
 
 output "kubectl_get_admin_password_command" {
-  description = "Команда для отримання пароля адміністратора"
+  description = "Command to get the admin password"
   value       = "kubectl get secret -n ${kubernetes_namespace.jenkins.metadata[0].name} ${kubernetes_secret.jenkins_admin.metadata[0].name} -o jsonpath='{.data.jenkins-admin-password}' | base64 -d"
 }
 
 output "kubectl_logs_command" {
-  description = "Команда для перегляду логів Jenkins"
+  description = "Command to view Jenkins logs"
   value       = "kubectl logs -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name} -f"
 }
 
-# Helm інформація
+# Helm information
 output "helm_status_command" {
-  description = "Команда для перевірки статусу Helm release"
+  description = "Command to check the Helm release status"
   value       = "helm status ${helm_release.jenkins.name} -n ${kubernetes_namespace.jenkins.metadata[0].name}"
 }
 
 output "helm_values_command" {
-  description = "Команда для перегляду Helm values"
+  description = "Command to view the Helm values"
   value       = "helm get values ${helm_release.jenkins.name} -n ${kubernetes_namespace.jenkins.metadata[0].name}"
 }
 
-# Конфігурація
+# Configuration
 output "jenkins_java_opts" {
-  description = "Java опції для Jenkins"
+  description = "Java options for Jenkins"
   value       = var.java_opts
 }
 
 output "jenkins_plugins_list" {
-  description = "Список встановлених плагінів"
+  description = "List of installed plugins"
   value       = var.install_plugins
 }
 
-# Моніторинг
+# Monitoring
 output "jenkins_prometheus_enabled" {
-  description = "Чи увімкнено Prometheus моніторинг"
+  description = "Whether Prometheus monitoring is enabled"
   value       = var.enable_prometheus_monitoring
 }
 
 output "jenkins_prometheus_endpoint" {
-  description = "Endpoint для Prometheus метрик"
+  description = "Endpoint for Prometheus metrics"
   value       = var.enable_prometheus_monitoring ? "${helm_release.jenkins.name}-jenkins.${kubernetes_namespace.jenkins.metadata[0].name}.svc.cluster.local:8080/prometheus" : null
 }
 
 # Backup
 output "jenkins_backup_enabled" {
-  description = "Чи увімкнено автоматичне резервне копіювання"
+  description = "Whether automatic backups are enabled"
   value       = var.enable_backup
 }
 
 output "jenkins_backup_schedule" {
-  description = "Розклад резервного копіювання"
+  description = "Backup schedule"
   value       = var.enable_backup ? var.backup_schedule : null
 }
 
-# Інтеграція з AWS
+# AWS integration
 output "jenkins_aws_region" {
-  description = "AWS регіон для інтеграції"
+  description = "AWS region for the integration"
   value       = var.aws_region != "" ? var.aws_region : null
 }
 
@@ -212,20 +212,20 @@ output "jenkins_ecr_registry_url" {
   value       = var.ecr_registry_url != "" ? var.ecr_registry_url : null
 }
 
-# Статус розгортання
+# Deployment status
 output "jenkins_deployment_status" {
-  description = "Статус розгортання Jenkins"
+  description = "Jenkins deployment status"
   value       = helm_release.jenkins.status
 }
 
 output "jenkins_chart_repository" {
-  description = "Helm repository для Jenkins chart"
+  description = "Helm repository for the Jenkins chart"
   value       = var.helm_repository
 }
 
-# Корисна інформація для CI/CD
+# Useful information for CI/CD
 output "jenkins_webhook_url" {
-  description = "URL для GitHub/GitLab webhooks"
+  description = "URL for GitHub/GitLab webhooks"
   value = var.ingress_enabled ? (
     var.ingress_tls_enabled ?
     "https://${var.ingress_hostname}/github-webhook/" :
@@ -234,7 +234,7 @@ output "jenkins_webhook_url" {
 }
 
 output "jenkins_api_url" {
-  description = "URL для Jenkins API"
+  description = "URL for the Jenkins API"
   value = var.ingress_enabled ? (
     var.ingress_tls_enabled ?
     "https://${var.ingress_hostname}/api/" :
@@ -242,9 +242,9 @@ output "jenkins_api_url" {
   ) : null
 }
 
-# Troubleshooting команди
+# Troubleshooting commands
 output "troubleshooting_commands" {
-  description = "Корисні команди для діагностики"
+  description = "Useful commands for diagnostics"
   value = {
     check_pods    = "kubectl get pods -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name}"
     describe_pod  = "kubectl describe pod -n ${kubernetes_namespace.jenkins.metadata[0].name} -l app.kubernetes.io/instance=${helm_release.jenkins.name}"

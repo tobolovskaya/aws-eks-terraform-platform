@@ -1,4 +1,4 @@
-# Налаштування бекенду для стейтів (S3 + DynamoDB)
+# Backend settings for state (S3 + DynamoDB)
 terraform {
   backend "s3" {
     bucket         = "terraform-state-bucket-unique-name"

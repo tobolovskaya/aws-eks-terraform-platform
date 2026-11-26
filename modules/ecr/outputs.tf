@@ -1,29 +1,29 @@
-# Виведення інформації про ECR
+# ECR outputs
 
-# Основна інформація про репозиторій
+# Basic repository information
 output "repository_arn" {
-  description = "ARN ECR репозиторію"
+  description = "ECR repository ARN"
   value       = aws_ecr_repository.main.arn
 }
 
 output "repository_name" {
-  description = "Назва ECR репозиторію"
+  description = "ECR repository name"
   value       = aws_ecr_repository.main.name
 }
 
 output "repository_url" {
-  description = "URL ECR репозиторію"
+  description = "ECR repository URL"
   value       = aws_ecr_repository.main.repository_url
 }
 
 output "registry_id" {
-  description = "ID реєстру ECR"
+  description = "ECR registry ID"
   value       = aws_ecr_repository.main.registry_id
 }
 
-# Інформація для Docker команд
+# Information for Docker commands
 output "docker_push_commands" {
-  description = "Команди для завантаження образу в ECR"
+  description = "Commands to push an image to ECR"
   value = [
     "aws ecr get-login-password --region ${data.aws_region.current.name} | docker login --username AWS --password-stdin ${aws_ecr_repository.main.repository_url}",
     "docker build -t ${aws_ecr_repository.main.name} .",
@@ -33,72 +33,72 @@ output "docker_push_commands" {
 }
 
 output "docker_pull_command" {
-  description = "Команда для завантаження образу з ECR"
+  description = "Command to pull an image from ECR"
   value       = "docker pull ${aws_ecr_repository.main.repository_url}:latest"
 }
 
-# Інформація про політики
+# Policy information
 output "lifecycle_policy_text" {
-  description = "Текст політики життєвого циклу"
+  description = "Lifecycle policy text"
   value       = var.enable_lifecycle_policy ? aws_ecr_lifecycle_policy.main[0].policy : null
 }
 
 output "repository_policy_text" {
-  description = "Текст політики репозиторію"
+  description = "Repository policy text"
   value       = var.enable_cross_account_access ? aws_ecr_repository_policy.main[0].policy : null
 }
 
-# Налаштування безпеки
+# Security settings
 output "image_scanning_enabled" {
-  description = "Чи увімкнено сканування образів"
+  description = "Whether image scanning is enabled"
   value       = var.scan_on_push
 }
 
 output "encryption_type" {
-  description = "Тип шифрування репозиторію"
+  description = "Repository encryption type"
   value       = var.encryption_type
 }
 
 output "image_tag_mutability" {
-  description = "Налаштування мутабельності тегів"
+  description = "Tag mutability setting"
   value       = var.image_tag_mutability
 }
 
-# Інформація про реплікацію
+# Replication information
 output "replication_destinations" {
-  description = "Регіони реплікації"
+  description = "Replication regions"
   value       = var.replication_regions
 }
 
-# Корисна інформація для CI/CD
+# Useful information for CI/CD
 output "ecr_login_command" {
-  description = "Команда для логіну в ECR"
+  description = "Command to log in to ECR"
   value       = "aws ecr get-login-password --region ${data.aws_region.current.name} | docker login --username AWS --password-stdin ${aws_ecr_repository.main.repository_url}"
 }
 
 output "image_uri_template" {
-  description = "Шаблон URI для образів"
+  description = "URI template for images"
   value       = "${aws_ecr_repository.main.repository_url}:TAG"
 }
 
-# Дані про поточний регіон
+# Current region
 data "aws_region" "current" {}
 
-# Статистика репозиторію
+# Repository statistics
 output "repository_creation_time" {
-  description = "Час створення репозиторію"
+  description = "Repository creation time"
   value       = aws_ecr_repository.main.id
 }
 
-# Інформація для Kubernetes
+# Information for Kubernetes
 output "kubernetes_image_pull_secret" {
-  description = "Команда для створення Kubernetes secret для ECR"
+  description = "Command to create a Kubernetes secret for ECR"
   value       = "kubectl create secret docker-registry ecr-secret --docker-server=${aws_ecr_repository.main.repository_url} --docker-username=AWS --docker-password=$(aws ecr get-login-password --region ${data.aws_region.current.name})"
 }
 
-# Helm values для використання в чартах
+# Helm values for use in charts
 output "helm_values" {
-  description = "Значення для використання в Helm чартах"
+  description = "Values for use in Helm charts"
   value = {
     image = {
       repository = aws_ecr_repository.main.repository_url

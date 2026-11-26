@@ -1,85 +1,85 @@
-# Змінні для Argo CD модуля
+# Variables for the Argo CD module
 
-# Основні параметри
+# Basic parameters
 variable "release_name" {
-  description = "Назва Helm release для Argo CD"
+  description = "Helm release name for Argo CD"
   type        = string
   default     = "argocd"
 
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.release_name))
-    error_message = "Release name повинна містити тільки малі літери, цифри та дефіси."
+    error_message = "Release name may only contain lowercase letters, digits and hyphens."
   }
 }
 
 variable "namespace" {
-  description = "Kubernetes namespace для Argo CD"
+  description = "Kubernetes namespace for Argo CD"
   type        = string
   default     = "argocd"
 
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.namespace))
-    error_message = "Namespace повинен містити тільки малі літери, цифри та дефіси."
+    error_message = "Namespace may only contain lowercase letters, digits and hyphens."
   }
 }
 
-# Helm налаштування
+# Helm settings
 variable "helm_repository" {
-  description = "Helm repository URL для Argo CD chart"
+  description = "Helm repository URL for the Argo CD chart"
   type        = string
   default     = "https://argoproj.github.io/argo-helm"
 }
 
 variable "helm_chart" {
-  description = "Назва Helm chart для Argo CD"
+  description = "Helm chart name for Argo CD"
   type        = string
   default     = "argo-cd"
 }
 
 variable "helm_chart_version" {
-  description = "Версія Helm chart для Argo CD"
+  description = "Helm chart version for Argo CD"
   type        = string
   default     = "5.51.6"
 }
 
 variable "helm_timeout" {
-  description = "Timeout для Helm операцій (секунди)"
+  description = "Timeout for Helm operations (seconds)"
   type        = number
   default     = 600
 
   validation {
     condition     = var.helm_timeout >= 300 && var.helm_timeout <= 1800
-    error_message = "Helm timeout повинен бути від 300 до 1800 секунд."
+    error_message = "Helm timeout must be between 300 and 1800 seconds."
   }
 }
 
-# Argo CD конфігурація
+# Argo CD configuration
 variable "admin_password" {
-  description = "Пароль адміністратора Argo CD"
+  description = "Argo CD admin password"
   type        = string
   sensitive   = true
 
   validation {
     condition     = length(var.admin_password) >= 8
-    error_message = "Пароль адміністратора повинен містити мінімум 8 символів."
+    error_message = "Admin password must be at least 8 characters long."
   }
 }
 
 variable "argocd_config_files" {
-  description = "Додаткові конфігураційні файли для Argo CD"
+  description = "Extra configuration files for Argo CD"
   type        = map(string)
   default     = {}
 }
 
 variable "additional_values" {
-  description = "Додаткові Helm values у YAML форматі"
+  description = "Extra Helm values in YAML format"
   type        = string
   default     = ""
 }
 
-# Ресурси для Controller
+# Resources for the Controller
 variable "controller_resources" {
-  description = "Ресурси для Argo CD Application Controller"
+  description = "Resources for the Argo CD Application Controller"
   type = object({
     requests = object({
       cpu    = string
@@ -102,9 +102,9 @@ variable "controller_resources" {
   }
 }
 
-# Ресурси для Server
+# Resources for the Server
 variable "server_resources" {
-  description = "Ресурси для Argo CD Server"
+  description = "Resources for the Argo CD Server"
   type = object({
     requests = object({
       cpu    = string
@@ -127,9 +127,9 @@ variable "server_resources" {
   }
 }
 
-# Ресурси для Repo Server
+# Resources for the Repo Server
 variable "repo_server_resources" {
-  description = "Ресурси для Argo CD Repo Server"
+  description = "Resources for the Argo CD Repo Server"
   type = object({
     requests = object({
       cpu    = string
@@ -154,64 +154,64 @@ variable "repo_server_resources" {
 
 # High Availability
 variable "enable_ha" {
-  description = "Увімкнути High Availability режим"
+  description = "Enable High Availability mode"
   type        = bool
   default     = false
 }
 
 variable "controller_replicas" {
-  description = "Кількість реплік Application Controller (HA режим)"
+  description = "Number of Application Controller replicas (HA mode)"
   type        = number
   default     = 1
 
   validation {
     condition     = var.controller_replicas >= 1 && var.controller_replicas <= 5
-    error_message = "Кількість реплік Controller повинна бути від 1 до 5."
+    error_message = "Controller replicas must be between 1 and 5."
   }
 }
 
 variable "server_replicas" {
-  description = "Кількість реплік Server (HA режим)"
+  description = "Number of Server replicas (HA mode)"
   type        = number
   default     = 2
 
   validation {
     condition     = var.server_replicas >= 1 && var.server_replicas <= 10
-    error_message = "Кількість реплік Server повинна бути від 1 до 10."
+    error_message = "Server replicas must be between 1 and 10."
   }
 }
 
 variable "repo_server_replicas" {
-  description = "Кількість реплік Repo Server (HA режим)"
+  description = "Number of Repo Server replicas (HA mode)"
   type        = number
   default     = 2
 
   validation {
     condition     = var.repo_server_replicas >= 1 && var.repo_server_replicas <= 10
-    error_message = "Кількість реплік Repo Server повинна бути від 1 до 10."
+    error_message = "Repo Server replicas must be between 1 and 10."
   }
 }
 
-# Мережеві налаштування
+# Network settings
 variable "service_type" {
-  description = "Тип Kubernetes service для Argo CD"
+  description = "Kubernetes service type for Argo CD"
   type        = string
   default     = "ClusterIP"
 
   validation {
     condition     = contains(["ClusterIP", "NodePort", "LoadBalancer"], var.service_type)
-    error_message = "Service type повинен бути ClusterIP, NodePort або LoadBalancer."
+    error_message = "Service type must be ClusterIP, NodePort or LoadBalancer."
   }
 }
 
 variable "create_load_balancer_service" {
-  description = "Створити додатковий LoadBalancer service"
+  description = "Create an extra LoadBalancer service"
   type        = bool
   default     = false
 }
 
 variable "load_balancer_annotations" {
-  description = "Анотації для LoadBalancer service"
+  description = "Annotations for the LoadBalancer service"
   type        = map(string)
   default = {
     "service.beta.kubernetes.io/aws-load-balancer-type"   = "nlb"
@@ -220,26 +220,26 @@ variable "load_balancer_annotations" {
 }
 
 variable "load_balancer_source_ranges" {
-  description = "CIDR блоки для доступу до LoadBalancer"
+  description = "CIDR blocks allowed to reach the LoadBalancer"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
-# Ingress налаштування
+# Ingress settings
 variable "ingress_enabled" {
-  description = "Увімкнути Ingress для Argo CD"
+  description = "Enable Ingress for Argo CD"
   type        = bool
   default     = true
 }
 
 variable "create_custom_ingress" {
-  description = "Створити кастомний Ingress ресурс"
+  description = "Create a custom Ingress resource"
   type        = bool
   default     = false
 }
 
 variable "ingress_hostname" {
-  description = "Hostname для Argo CD Ingress"
+  description = "Hostname for the Argo CD Ingress"
   type        = string
   default     = "argocd.local"
 }
@@ -251,7 +251,7 @@ variable "ingress_class_name" {
 }
 
 variable "ingress_annotations" {
-  description = "Додаткові анотації для Ingress"
+  description = "Extra annotations for the Ingress"
   type        = map(string)
   default = {
     "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
@@ -259,96 +259,96 @@ variable "ingress_annotations" {
 }
 
 variable "ingress_tls_enabled" {
-  description = "Увімкнути TLS для Ingress"
+  description = "Enable TLS for the Ingress"
   type        = bool
   default     = true
 }
 
 variable "ingress_tls_secret_name" {
-  description = "Назва secret для TLS сертифіката"
+  description = "Name of the secret with the TLS certificate"
   type        = string
   default     = "argocd-tls"
 }
 
 # Auto Scaling
 variable "enable_hpa" {
-  description = "Увімкнути HorizontalPodAutoscaler"
+  description = "Enable HorizontalPodAutoscaler"
   type        = bool
   default     = false
 }
 
 variable "hpa_min_replicas" {
-  description = "Мінімальна кількість реплік для HPA"
+  description = "Minimum number of replicas for HPA"
   type        = number
   default     = 2
 
   validation {
     condition     = var.hpa_min_replicas >= 1
-    error_message = "Мінімальна кількість реплік повинна бути мінімум 1."
+    error_message = "Minimum replicas must be at least 1."
   }
 }
 
 variable "hpa_max_replicas" {
-  description = "Максимальна кількість реплік для HPA"
+  description = "Maximum number of replicas for HPA"
   type        = number
   default     = 5
 
   validation {
     condition     = var.hpa_max_replicas >= 1
-    error_message = "Максимальна кількість реплік повинна бути мінімум 1."
+    error_message = "Maximum replicas must be at least 1."
   }
 }
 
 variable "hpa_target_cpu_utilization" {
-  description = "Цільова утилізація CPU для HPA (%)"
+  description = "Target CPU utilization for HPA (%)"
   type        = number
   default     = 70
 
   validation {
     condition     = var.hpa_target_cpu_utilization >= 1 && var.hpa_target_cpu_utilization <= 100
-    error_message = "Цільова утилізація CPU повинна бути від 1% до 100%."
+    error_message = "Target CPU utilization must be between 1% and 100%."
   }
 }
 
 variable "hpa_target_memory_utilization" {
-  description = "Цільова утилізація пам'яті для HPA (%)"
+  description = "Target memory utilization for HPA (%)"
   type        = number
   default     = 80
 
   validation {
     condition     = var.hpa_target_memory_utilization >= 1 && var.hpa_target_memory_utilization <= 100
-    error_message = "Цільова утилізація пам'яті повинна бути від 1% до 100%."
+    error_message = "Target memory utilization must be between 1% and 100%."
   }
 }
 
-# Функціональність
+# Features
 variable "enable_metrics" {
-  description = "Увімкнути Prometheus метрики"
+  description = "Enable Prometheus metrics"
   type        = bool
   default     = true
 }
 
 variable "enable_notifications" {
-  description = "Увімкнути Argo CD Notifications"
+  description = "Enable Argo CD Notifications"
   type        = bool
   default     = true
 }
 
 variable "enable_applicationset" {
-  description = "Увімкнути ApplicationSet Controller"
+  description = "Enable ApplicationSet Controller"
   type        = bool
   default     = true
 }
 
 variable "enable_dex" {
-  description = "Увімкнути Dex для OIDC аутентифікації"
+  description = "Enable Dex for OIDC authentication"
   type        = bool
   default     = false
 }
 
-# Git Repository налаштування
+# Git repository settings
 variable "git_repositories" {
-  description = "Список Git репозиторіїв для Argo CD"
+  description = "List of Git repositories for Argo CD"
   type = list(object({
     url      = string
     name     = string
@@ -361,132 +361,132 @@ variable "git_repositories" {
 
 # Demo Application
 variable "create_demo_application" {
-  description = "Створити демонстраційний Application"
+  description = "Create a demo Application"
   type        = bool
   default     = false
 }
 
 variable "demo_app_repo_url" {
-  description = "URL репозиторію для демо додатку"
+  description = "Repository URL for the demo app"
   type        = string
   default     = "https://github.com/argoproj/argocd-example-apps.git"
 }
 
 variable "demo_app_target_revision" {
-  description = "Target revision для демо додатку"
+  description = "Target revision for the demo app"
   type        = string
   default     = "HEAD"
 }
 
 variable "demo_app_path" {
-  description = "Шлях в репозиторії для демо додатку"
+  description = "Path in the repository for the demo app"
   type        = string
   default     = "guestbook"
 }
 
 variable "demo_app_namespace" {
-  description = "Namespace для демо додатку"
+  description = "Namespace for the demo app"
   type        = string
   default     = "default"
 }
 
 # AppProject
 variable "create_app_project" {
-  description = "Створити AppProject"
+  description = "Create an AppProject"
   type        = bool
   default     = false
 }
 
 variable "app_project_name" {
-  description = "Назва AppProject"
+  description = "AppProject name"
   type        = string
   default     = "default"
 }
 
 variable "app_project_source_repos" {
-  description = "Дозволені source repositories для AppProject"
+  description = "Allowed source repositories for the AppProject"
   type        = list(string)
   default     = ["*"]
 }
 
 variable "app_project_admin_groups" {
-  description = "OIDC групи з admin правами"
+  description = "OIDC groups with admin rights"
   type        = list(string)
   default     = []
 }
 
 variable "app_project_developer_groups" {
-  description = "OIDC групи з developer правами"
+  description = "OIDC groups with developer rights"
   type        = list(string)
   default     = []
 }
 
 # RBAC
 variable "rbac_policy" {
-  description = "Кастомна RBAC політика для Argo CD"
+  description = "Custom RBAC policy for Argo CD"
   type        = string
   default     = ""
 }
 
 variable "rbac_scopes" {
-  description = "RBAC scopes для Argo CD"
+  description = "RBAC scopes for Argo CD"
   type        = string
   default     = "[groups]"
 }
 
-# Безпека
+# Security
 variable "enable_insecure" {
-  description = "Увімкнути insecure режим (тільки для розробки)"
+  description = "Enable insecure mode (development only)"
   type        = bool
   default     = false
 }
 
 variable "certificate_secret_name" {
-  description = "Назва secret з TLS сертифікатом"
+  description = "Name of the secret with the TLS certificate"
   type        = string
   default     = ""
 }
 
-# Моніторинг
+# Monitoring
 variable "enable_prometheus_monitoring" {
-  description = "Увімкнути Prometheus моніторинг"
+  description = "Enable Prometheus monitoring"
   type        = bool
   default     = true
 }
 
 variable "prometheus_scrape_interval" {
-  description = "Інтервал збору метрик Prometheus"
+  description = "Prometheus scrape interval"
   type        = string
   default     = "30s"
 }
 
 # Backup
 variable "enable_backup" {
-  description = "Увімкнути автоматичне резервне копіювання"
+  description = "Enable automatic backups"
   type        = bool
   default     = false
 }
 
 variable "backup_schedule" {
-  description = "Cron розклад для резервного копіювання"
+  description = "Cron schedule for backups"
   type        = string
   default     = "0 2 * * *"
 }
 
 variable "backup_retention_days" {
-  description = "Кількість днів зберігання резервних копій"
+  description = "Number of days to keep backups"
   type        = number
   default     = 30
 
   validation {
     condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
-    error_message = "Період зберігання резервних копій повинен бути від 1 до 365 днів."
+    error_message = "Backup retention must be between 1 and 365 days."
   }
 }
 
-# Теги
+# Tags
 variable "tags" {
-  description = "Теги для ресурсів"
+  description = "Tags for resources"
   type        = map(string)
   default = {
     ManagedBy = "terraform"
@@ -494,93 +494,93 @@ variable "tags" {
   }
 }
 
-# Додаткові налаштування
+# Extra settings
 variable "timezone" {
-  description = "Часовий пояс для Argo CD"
+  description = "Time zone for Argo CD"
   type        = string
   default     = "UTC"
 }
 
 variable "log_level" {
-  description = "Рівень логування для Argo CD"
+  description = "Log level for Argo CD"
   type        = string
   default     = "info"
 
   validation {
     condition     = contains(["debug", "info", "warn", "error"], var.log_level)
-    error_message = "Log level повинен бути одним з: debug, info, warn, error."
+    error_message = "Log level must be one of: debug, info, warn, error."
   }
 }
 
 variable "log_format" {
-  description = "Формат логування для Argo CD"
+  description = "Log format for Argo CD"
   type        = string
   default     = "text"
 
   validation {
     condition     = contains(["text", "json"], var.log_format)
-    error_message = "Log format повинен бути text або json."
+    error_message = "Log format must be text or json."
   }
 }
 
 variable "server_extra_args" {
-  description = "Додаткові аргументи для Argo CD Server"
+  description = "Extra arguments for the Argo CD Server"
   type        = list(string)
   default     = []
 }
 
 variable "controller_extra_args" {
-  description = "Додаткові аргументи для Application Controller"
+  description = "Extra arguments for the Application Controller"
   type        = list(string)
   default     = []
 }
 
 variable "repo_server_extra_args" {
-  description = "Додаткові аргументи для Repo Server"
+  description = "Extra arguments for the Repo Server"
   type        = list(string)
   default     = []
 }
 
-# Webhook налаштування
+# Webhook settings
 variable "enable_webhooks" {
-  description = "Увімкнути webhook підтримку"
+  description = "Enable webhook support"
   type        = bool
   default     = true
 }
 
 variable "webhook_github_secret" {
-  description = "Secret для GitHub webhooks"
+  description = "Secret for GitHub webhooks"
   type        = string
   default     = ""
   sensitive   = true
 }
 
 variable "webhook_gitlab_secret" {
-  description = "Secret для GitLab webhooks"
+  description = "Secret for GitLab webhooks"
   type        = string
   default     = ""
   sensitive   = true
 }
 
-# Sync налаштування
+# Sync settings
 variable "sync_timeout" {
-  description = "Timeout для sync операцій (секунди)"
+  description = "Timeout for sync operations (seconds)"
   type        = number
   default     = 300
 
   validation {
     condition     = var.sync_timeout >= 60 && var.sync_timeout <= 3600
-    error_message = "Sync timeout повинен бути від 60 до 3600 секунд."
+    error_message = "Sync timeout must be between 60 and 3600 seconds."
   }
 }
 
 variable "self_heal_timeout" {
-  description = "Timeout для self-heal операцій (секунди)"
+  description = "Timeout for self-heal operations (seconds)"
   type        = number
   default     = 5
 
   validation {
     condition     = var.self_heal_timeout >= 1 && var.self_heal_timeout <= 60
-    error_message = "Self-heal timeout повинен бути від 1 до 60 секунд."
+    error_message = "Self-heal timeout must be between 1 and 60 seconds."
   }
 }

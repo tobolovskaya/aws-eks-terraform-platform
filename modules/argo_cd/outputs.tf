@@ -1,24 +1,24 @@
-# Виведення інформації про Argo CD
+# Argo CD outputs
 
-# Основна інформація
+# Basic information
 output "argocd_namespace" {
-  description = "Kubernetes namespace де встановлено Argo CD"
+  description = "Kubernetes namespace where Argo CD is installed"
   value       = kubernetes_namespace.argocd.metadata[0].name
 }
 
 output "argocd_release_name" {
-  description = "Назва Helm release для Argo CD"
+  description = "Helm release name for Argo CD"
   value       = helm_release.argocd.name
 }
 
 output "argocd_chart_version" {
-  description = "Версія Helm chart Argo CD"
+  description = "Argo CD Helm chart version"
   value       = helm_release.argocd.version
 }
 
-# Доступ до Argo CD
+# Access to Argo CD
 output "argocd_url" {
-  description = "URL для доступу до Argo CD"
+  description = "URL to access Argo CD"
   value = var.ingress_enabled ? (
     var.ingress_tls_enabled ?
     "https://${var.ingress_hostname}" :
@@ -26,63 +26,63 @@ output "argocd_url" {
     ) : (
     var.service_type == "LoadBalancer" && var.create_load_balancer_service ?
     "http://${try(kubernetes_service.argocd_lb[0].status[0].load_balancer[0].ingress[0].hostname, "pending")}" :
-    "http://localhost:8080 (використовуйте kubectl port-forward)"
+    "http://localhost:8080 (use kubectl port-forward)"
   )
 }
 
 output "argocd_internal_url" {
-  description = "Внутрішній URL Argo CD в кластері"
+  description = "Internal Argo CD URL inside the cluster"
   value       = "http://${helm_release.argocd.name}-argocd-server.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local"
 }
 
-# Креденшели
+# Credentials
 output "argocd_admin_password" {
-  description = "Пароль адміністратора Argo CD"
+  description = "Argo CD admin password"
   value       = var.admin_password
   sensitive   = true
 }
 
 output "argocd_admin_secret_name" {
-  description = "Назва Kubernetes secret з паролем адміністратора"
+  description = "Name of the Kubernetes secret with the admin password"
   value       = kubernetes_secret.argocd_admin.metadata[0].name
 }
 
 # Service Account
 output "argocd_service_account_name" {
-  description = "Назва Service Account для Argo CD"
+  description = "Service Account name for Argo CD"
   value       = kubernetes_service_account.argocd.metadata[0].name
 }
 
 output "argocd_cluster_role_name" {
-  description = "Назва Cluster Role для Argo CD"
+  description = "Cluster Role name for Argo CD"
   value       = kubernetes_cluster_role.argocd.metadata[0].name
 }
 
-# Мережеві ресурси
+# Network resources
 output "argocd_service_name" {
-  description = "Назва основного Kubernetes service для Argo CD"
+  description = "Name of the main Kubernetes service for Argo CD"
   value       = "${helm_release.argocd.name}-argocd-server"
 }
 
 output "argocd_service_type" {
-  description = "Тип Kubernetes service для Argo CD"
+  description = "Kubernetes service type for Argo CD"
   value       = var.service_type
 }
 
 output "argocd_load_balancer_service_name" {
-  description = "Назва LoadBalancer service (якщо створено)"
+  description = "Name of the LoadBalancer service (if created)"
   value       = var.create_load_balancer_service ? kubernetes_service.argocd_lb[0].metadata[0].name : null
 }
 
 output "argocd_load_balancer_hostname" {
-  description = "Hostname LoadBalancer (якщо доступний)"
+  description = "LoadBalancer hostname (if available)"
   value = var.service_type == "LoadBalancer" && var.create_load_balancer_service ? (
     try(kubernetes_service.argocd_lb[0].status[0].load_balancer[0].ingress[0].hostname, null)
   ) : null
 }
 
 output "argocd_load_balancer_ip" {
-  description = "IP адреса LoadBalancer (якщо доступна)"
+  description = "LoadBalancer IP address (if available)"
   value = var.service_type == "LoadBalancer" && var.create_load_balancer_service ? (
     try(kubernetes_service.argocd_lb[0].status[0].load_balancer[0].ingress[0].ip, null)
   ) : null
@@ -90,66 +90,66 @@ output "argocd_load_balancer_ip" {
 
 # Ingress
 output "argocd_ingress_name" {
-  description = "Назва Ingress ресурсу (якщо створено)"
+  description = "Name of the Ingress resource (if created)"
   value       = var.create_custom_ingress ? kubernetes_ingress_v1.argocd[0].metadata[0].name : null
 }
 
 output "argocd_ingress_hostname" {
-  description = "Hostname для Ingress"
+  description = "Hostname for the Ingress"
   value       = var.ingress_enabled ? var.ingress_hostname : null
 }
 
 output "argocd_ingress_tls_secret" {
-  description = "Назва TLS secret для Ingress"
+  description = "Name of the TLS secret for the Ingress"
   value       = var.ingress_tls_enabled ? var.ingress_tls_secret_name : null
 }
 
 # Auto Scaling
 output "argocd_hpa_name" {
-  description = "Назва HorizontalPodAutoscaler (якщо увімкнено)"
+  description = "Name of the HorizontalPodAutoscaler (if enabled)"
   value       = var.enable_hpa ? kubernetes_horizontal_pod_autoscaler_v2.argocd_server[0].metadata[0].name : null
 }
 
 output "argocd_hpa_min_replicas" {
-  description = "Мінімальна кількість реплік HPA"
+  description = "Minimum number of HPA replicas"
   value       = var.enable_hpa ? var.hpa_min_replicas : null
 }
 
 output "argocd_hpa_max_replicas" {
-  description = "Максимальна кількість реплік HPA"
+  description = "Maximum number of HPA replicas"
   value       = var.enable_hpa ? var.hpa_max_replicas : null
 }
 
-# Команди для доступу
+# Access commands
 output "kubectl_port_forward_command" {
-  description = "Команда для port-forward до Argo CD"
+  description = "Command to port-forward to Argo CD"
   value       = "kubectl port-forward -n ${kubernetes_namespace.argocd.metadata[0].name} svc/${helm_release.argocd.name}-argocd-server 8080:80"
 }
 
 output "kubectl_get_admin_password_command" {
-  description = "Команда для отримання пароля адміністратора"
+  description = "Command to get the admin password"
   value       = "kubectl get secret -n ${kubernetes_namespace.argocd.metadata[0].name} ${kubernetes_secret.argocd_admin.metadata[0].name} -o jsonpath='{.data.password}' | base64 -d"
 }
 
 output "kubectl_logs_command" {
-  description = "Команда для перегляду логів Argo CD"
+  description = "Command to view Argo CD logs"
   value       = "kubectl logs -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/name=argocd-server -f"
 }
 
-# Helm інформація
+# Helm information
 output "helm_status_command" {
-  description = "Команда для перевірки статусу Helm release"
+  description = "Command to check the Helm release status"
   value       = "helm status ${helm_release.argocd.name} -n ${kubernetes_namespace.argocd.metadata[0].name}"
 }
 
 output "helm_values_command" {
-  description = "Команда для перегляду Helm values"
+  description = "Command to view the Helm values"
   value       = "helm get values ${helm_release.argocd.name} -n ${kubernetes_namespace.argocd.metadata[0].name}"
 }
 
-# CLI команди
+# CLI commands
 output "argocd_cli_login_command" {
-  description = "Команда для логіну через Argo CD CLI"
+  description = "Command to log in with the Argo CD CLI"
   value = var.ingress_enabled ? (
     "argocd login ${var.ingress_hostname} --username admin --password '${var.admin_password}'"
     ) : (
@@ -159,7 +159,7 @@ output "argocd_cli_login_command" {
 }
 
 output "argocd_cli_context_command" {
-  description = "Команда для встановлення контексту Argo CD CLI"
+  description = "Command to set the Argo CD CLI context"
   value = var.ingress_enabled ? (
     "argocd context ${var.ingress_hostname}"
     ) : (
@@ -167,42 +167,42 @@ output "argocd_cli_context_command" {
   )
 }
 
-# GitOps інформація
+# GitOps information
 output "argocd_applications_command" {
-  description = "Команда для перегляду Applications"
+  description = "Command to list Applications"
   value       = "argocd app list"
 }
 
 output "argocd_sync_command" {
-  description = "Команда для синхронізації додатку"
+  description = "Command to sync an application"
   value       = "argocd app sync <app-name>"
 }
 
 # Demo Application
 output "demo_application_name" {
-  description = "Назва демонстраційного Application (якщо створено)"
+  description = "Name of the demo Application (if created)"
   value       = var.create_demo_application ? "demo-app" : null
 }
 
 output "demo_application_namespace" {
-  description = "Namespace демонстраційного Application"
+  description = "Namespace of the demo Application"
   value       = var.create_demo_application ? var.demo_app_namespace : null
 }
 
 # AppProject
 output "app_project_name" {
-  description = "Назва AppProject (якщо створено)"
+  description = "AppProject name (if created)"
   value       = var.create_app_project ? var.app_project_name : null
 }
 
-# Моніторинг
+# Monitoring
 output "argocd_prometheus_enabled" {
-  description = "Чи увімкнено Prometheus моніторинг"
+  description = "Whether Prometheus monitoring is enabled"
   value       = var.enable_prometheus_monitoring
 }
 
 output "argocd_metrics_endpoints" {
-  description = "Endpoints для Prometheus метрик"
+  description = "Endpoints for Prometheus metrics"
   value = var.enable_metrics ? {
     server      = "${helm_release.argocd.name}-argocd-server-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8083"
     controller  = "${helm_release.argocd.name}-argocd-application-controller-metrics.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local:8082"
@@ -210,9 +210,9 @@ output "argocd_metrics_endpoints" {
   } : null
 }
 
-# Функціональність
+# Features
 output "argocd_features_enabled" {
-  description = "Увімкнені функції Argo CD"
+  description = "Enabled Argo CD features"
   value = {
     high_availability = var.enable_ha
     metrics           = var.enable_metrics
@@ -223,20 +223,20 @@ output "argocd_features_enabled" {
   }
 }
 
-# Статус розгортання
+# Deployment status
 output "argocd_deployment_status" {
-  description = "Статус розгортання Argo CD"
+  description = "Argo CD deployment status"
   value       = helm_release.argocd.status
 }
 
 output "argocd_chart_repository" {
-  description = "Helm repository для Argo CD chart"
+  description = "Helm repository for the Argo CD chart"
   value       = var.helm_repository
 }
 
-# Корисна інформація для GitOps
+# Useful information for GitOps
 output "argocd_webhook_urls" {
-  description = "URLs для Git webhooks"
+  description = "URLs for Git webhooks"
   value = var.ingress_enabled ? {
     github = (var.ingress_tls_enabled ?
       "https://${var.ingress_hostname}/api/webhook" :
@@ -248,7 +248,7 @@ output "argocd_webhook_urls" {
 }
 
 output "argocd_api_url" {
-  description = "URL для Argo CD API"
+  description = "URL for the Argo CD API"
   value = var.ingress_enabled ? (
     var.ingress_tls_enabled ?
     "https://${var.ingress_hostname}/api/v1/" :
@@ -256,9 +256,9 @@ output "argocd_api_url" {
   ) : null
 }
 
-# Troubleshooting команди
+# Troubleshooting commands
 output "troubleshooting_commands" {
-  description = "Корисні команди для діагностики"
+  description = "Useful commands for diagnostics"
   value = {
     check_pods          = "kubectl get pods -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/part-of=argocd"
     describe_server     = "kubectl describe pod -n ${kubernetes_namespace.argocd.metadata[0].name} -l app.kubernetes.io/name=argocd-server"
@@ -271,9 +271,9 @@ output "troubleshooting_commands" {
   }
 }
 
-# Конфігурація для інтеграції з CI/CD
+# Configuration for CI/CD integration
 output "argocd_integration_info" {
-  description = "Інформація для інтеграції з CI/CD системами"
+  description = "Information for integrating with CI/CD systems"
   value = {
     server_url = var.ingress_enabled ? (
       var.ingress_tls_enabled ?

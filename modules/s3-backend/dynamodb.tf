@@ -1,4 +1,4 @@
-# Створення DynamoDB таблиці для блокування стану Terraform
+# Create the DynamoDB table for Terraform state locking
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
   #checkov:skip=CKV_AWS_119: lock table holds only lock IDs, no secrets; AWS-owned key encryption is enough
@@ -6,7 +6,7 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
   billing_mode = var.dynamodb_billing_mode
   hash_key     = "LockID"
 
-  # Налаштування для on-demand billing
+  # Settings for on-demand billing
   dynamic "attribute" {
     for_each = var.dynamodb_billing_mode == "PAY_PER_REQUEST" ? [1] : []
     content {
@@ -15,7 +15,7 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
     }
   }
 
-  # Налаштування для provisioned billing
+  # Settings for provisioned billing
   dynamic "attribute" {
     for_each = var.dynamodb_billing_mode == "PROVISIONED" ? [1] : []
     content {
@@ -24,11 +24,11 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
     }
   }
 
-  # Provisioned throughput (тільки для PROVISIONED режиму)
+  # Provisioned throughput (PROVISIONED mode only)
   read_capacity  = var.dynamodb_billing_mode == "PROVISIONED" ? var.dynamodb_read_capacity : null
   write_capacity = var.dynamodb_billing_mode == "PROVISIONED" ? var.dynamodb_write_capacity : null
 
-  # Шифрування
+  # Encryption
   server_side_encryption {
     enabled = true
   }
@@ -38,7 +38,7 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
     enabled = var.enable_point_in_time_recovery
   }
 
-  # Теги
+  # Tags
   tags = merge(var.tags, {
     Name        = var.dynamodb_table_name
     Purpose     = "Terraform State Locking"
@@ -50,7 +50,7 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
   }
 }
 
-# Auto Scaling для DynamoDB (тільки для PROVISIONED режиму)
+# Auto Scaling for DynamoDB (PROVISIONED mode only)
 resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
   count              = var.dynamodb_billing_mode == "PROVISIONED" && var.enable_dynamodb_autoscaling ? 1 : 0
   max_capacity       = var.dynamodb_autoscaling_read_max_capacity
@@ -101,7 +101,7 @@ resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
   }
 }
 
-# CloudWatch алерти для моніторингу
+# CloudWatch alarms for monitoring
 resource "aws_cloudwatch_metric_alarm" "dynamodb_read_throttle" {
   count               = var.enable_cloudwatch_alarms ? 1 : 0
   alarm_name          = "${var.dynamodb_table_name}-read-throttle"

@@ -1,6 +1,6 @@
-# Створення S3-бакета для зберігання стану Terraform
+# Create the S3 bucket for Terraform state
 
-# S3 бакет для стану Terraform
+# S3 bucket for Terraform state
 resource "aws_s3_bucket" "terraform_state" {
   #checkov:skip=CKV2_AWS_62: no consumer for event notifications on the state bucket
   #checkov:skip=CKV_AWS_144: versioning protects state; cross-region replication is out of scope for a single-region lab
@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-# Налаштування версіонування
+# Versioning
 resource "aws_s3_bucket_versioning" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -26,7 +26,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   }
 }
 
-# Налаштування шифрування
+# Encryption
 # State can contain secrets (e.g. database passwords), so encrypt it with KMS
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
@@ -39,7 +39,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
   }
 }
 
-# Блокування публічного доступу
+# Block public access
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -49,7 +49,7 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
   restrict_public_buckets = true
 }
 
-# Політика бакета для додаткової безпеки
+# Bucket policy for extra security
 resource "aws_s3_bucket_policy" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -77,7 +77,7 @@ resource "aws_s3_bucket_policy" "terraform_state" {
   depends_on = [aws_s3_bucket_public_access_block.terraform_state]
 }
 
-# Налаштування lifecycle для очищення старих версій
+# Lifecycle rules to clean up old versions
 resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -85,23 +85,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
     id     = "terraform_state_lifecycle"
     status = "Enabled"
 
-    # Видалення неповних multipart uploads
+    # Remove incomplete multipart uploads
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
 
-    # Зберігання старих версій
+    # Keep old versions
     noncurrent_version_expiration {
       noncurrent_days = var.state_retention_days
     }
 
-    # Переведення старих версій в IA storage class
+    # Move old versions to the IA storage class
     noncurrent_version_transition {
       noncurrent_days = 30
       storage_class   = "STANDARD_IA"
     }
 
-    # Переведення старих версій в Glacier
+    # Move old versions to Glacier
     noncurrent_version_transition {
       noncurrent_days = 90
       storage_class   = "GLACIER"
@@ -109,7 +109,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
   }
 }
 
-# Налаштування логування доступу (опціонально)
+# Access logging (optional)
 resource "aws_s3_bucket" "access_logs" {
   #checkov:skip=CKV2_AWS_62: log bucket, no consumer for event notifications
   #checkov:skip=CKV_AWS_144: access logs are not replicated to another region in this lab
@@ -124,7 +124,7 @@ resource "aws_s3_bucket" "access_logs" {
   })
 }
 
-# Захист bucket з логами доступу: ті самі правила, що й для bucket зі state
+# Protect the access log bucket: same rules as the state bucket
 resource "aws_s3_bucket_public_access_block" "access_logs" {
   count  = var.enable_access_logging ? 1 : 0
   bucket = aws_s3_bucket.access_logs[0].id
@@ -144,7 +144,7 @@ resource "aws_s3_bucket_versioning" "access_logs" {
   }
 }
 
-# Для S3 server access logs цільовий bucket має використовувати SSE-S3 (AES256), не KMS
+# S3 server access logs require SSE-S3 (AES256) on the target bucket, not KMS
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
   count  = var.enable_access_logging ? 1 : 0
   bucket = aws_s3_bucket.access_logs[0].id

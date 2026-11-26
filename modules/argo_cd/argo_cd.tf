@@ -1,6 +1,6 @@
-# Argo CD Helm Release модуль
+# Argo CD Helm release module
 
-# Namespace для Argo CD
+# Namespace for Argo CD
 resource "kubernetes_namespace" "argocd" {
   metadata {
     name = var.namespace
@@ -12,7 +12,7 @@ resource "kubernetes_namespace" "argocd" {
   }
 }
 
-# Secret для Argo CD admin password
+# Secret for the Argo CD admin password
 resource "kubernetes_secret" "argocd_admin" {
   metadata {
     name      = "argocd-initial-admin-secret"
@@ -30,7 +30,7 @@ resource "kubernetes_secret" "argocd_admin" {
   type = "Opaque"
 }
 
-# ServiceAccount для Argo CD з необхідними правами
+# ServiceAccount for Argo CD with the required permissions
 resource "kubernetes_service_account" "argocd" {
   metadata {
     name      = "argocd-application-controller"
@@ -46,7 +46,7 @@ resource "kubernetes_service_account" "argocd" {
   automount_service_account_token = true
 }
 
-# ClusterRole для Argo CD
+# ClusterRole for Argo CD
 resource "kubernetes_cluster_role" "argocd" {
   #checkov:skip=CKV_K8S_49: Argo CD must manage arbitrary resources across the cluster; wildcards are required by design
   metadata {
@@ -71,7 +71,7 @@ resource "kubernetes_cluster_role" "argocd" {
   }
 }
 
-# ClusterRoleBinding для Argo CD
+# ClusterRoleBinding for Argo CD
 resource "kubernetes_cluster_role_binding" "argocd" {
   metadata {
     name = "argocd-application-controller"
@@ -96,7 +96,7 @@ resource "kubernetes_cluster_role_binding" "argocd" {
   }
 }
 
-# ConfigMap для додаткових Argo CD конфігурацій
+# ConfigMap for extra Argo CD configuration
 resource "kubernetes_config_map" "argocd_config" {
   count = length(var.argocd_config_files) > 0 ? 1 : 0
 
@@ -112,7 +112,7 @@ resource "kubernetes_config_map" "argocd_config" {
   data = var.argocd_config_files
 }
 
-# Helm Release для Argo CD
+# Helm release for Argo CD
 resource "helm_release" "argocd" {
   name       = var.release_name
   repository = var.helm_repository
@@ -120,13 +120,13 @@ resource "helm_release" "argocd" {
   version    = var.helm_chart_version
   namespace  = kubernetes_namespace.argocd.metadata[0].name
 
-  # Використання values.yaml файлу
+  # Use the values.yaml file
   values = [
     file("${path.module}/values.yaml"),
     var.additional_values
   ]
 
-  # Динамічні значення
+  # Dynamic values
   set_sensitive {
     name  = "configs.secret.argocdServerAdminPassword"
     value = bcrypt(var.admin_password)
@@ -217,7 +217,7 @@ resource "helm_release" "argocd" {
     value = var.repo_server_resources.limits.memory
   }
 
-  # High Availability налаштування
+  # High Availability settings
   set {
     name  = "controller.replicas"
     value = var.enable_ha ? var.controller_replicas : 1
@@ -287,12 +287,12 @@ resource "helm_release" "argocd" {
 
   timeout = var.helm_timeout
 
-  # Очікування готовності
+  # Wait until ready
   wait          = true
   wait_for_jobs = true
 }
 
-# Service для доступу до Argo CD (якщо потрібен LoadBalancer)
+# Service to access Argo CD (if a LoadBalancer is needed)
 resource "kubernetes_service" "argocd_lb" {
   count = var.service_type == "LoadBalancer" && var.create_load_balancer_service ? 1 : 0
 
@@ -334,7 +334,7 @@ resource "kubernetes_service" "argocd_lb" {
   }
 }
 
-# Ingress для Argo CD (якщо увімкнено)
+# Ingress for Argo CD (if enabled)
 resource "kubernetes_ingress_v1" "argocd" {
   count = var.ingress_enabled && var.create_custom_ingress ? 1 : 0
 
@@ -389,7 +389,7 @@ resource "kubernetes_ingress_v1" "argocd" {
   }
 }
 
-# HorizontalPodAutoscaler для Argo CD Server (опціонально)
+# HorizontalPodAutoscaler for the Argo CD Server (optional)
 resource "kubernetes_horizontal_pod_autoscaler_v2" "argocd_server" {
   count = var.enable_hpa ? 1 : 0
 
@@ -438,7 +438,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "argocd_server" {
   }
 }
 
-# Application для демонстрації GitOps
+# Application to demonstrate GitOps
 resource "kubernetes_manifest" "demo_application" {
   count = var.create_demo_application ? 1 : 0
 
@@ -479,7 +479,7 @@ resource "kubernetes_manifest" "demo_application" {
   depends_on = [helm_release.argocd]
 }
 
-# AppProject для організації додатків
+# AppProject to organize applications
 resource "kubernetes_manifest" "app_project" {
   count = var.create_app_project ? 1 : 0
 

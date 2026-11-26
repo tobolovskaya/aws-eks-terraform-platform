@@ -1,53 +1,53 @@
-# Змінні для ECR модуля
+# Variables for the ECR module
 
-# Основні параметри
+# Basic parameters
 variable "repository_name" {
-  description = "Назва ECR репозиторію"
+  description = "ECR repository name"
   type        = string
 
   validation {
     condition     = can(regex("^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$", var.repository_name))
-    error_message = "Назва репозиторію повинна містити тільки малі літери, цифри, крапки, дефіси та підкреслення."
+    error_message = "Repository name may only contain lowercase letters, digits, dots, hyphens and underscores."
   }
 }
 
 variable "image_tag_mutability" {
-  description = "Можливість змінювати теги образів (MUTABLE або IMMUTABLE)"
+  description = "Image tag mutability (MUTABLE or IMMUTABLE)"
   type        = string
   default     = "IMMUTABLE"
 
   validation {
     condition     = contains(["MUTABLE", "IMMUTABLE"], var.image_tag_mutability)
-    error_message = "Image tag mutability повинен бути MUTABLE або IMMUTABLE."
+    error_message = "Image tag mutability must be MUTABLE or IMMUTABLE."
   }
 }
 
-# Налаштування сканування
+# Scanning settings
 variable "scan_on_push" {
-  description = "Сканувати образи при завантаженні"
+  description = "Scan images on push"
   type        = bool
   default     = true
 }
 
 variable "enable_registry_scanning" {
-  description = "Увімкнути розширене сканування реєстру"
+  description = "Enable enhanced registry scanning"
   type        = bool
   default     = false
 }
 
 variable "registry_scan_type" {
-  description = "Тип сканування реєстру (BASIC або ENHANCED)"
+  description = "Registry scan type (BASIC or ENHANCED)"
   type        = string
   default     = "BASIC"
 
   validation {
     condition     = contains(["BASIC", "ENHANCED"], var.registry_scan_type)
-    error_message = "Registry scan type повинен бути BASIC або ENHANCED."
+    error_message = "Registry scan type must be BASIC or ENHANCED."
   }
 }
 
 variable "registry_scan_filters" {
-  description = "Фільтри для сканування реєстру"
+  description = "Filters for registry scanning"
   type = list(object({
     filter         = string
     filter_type    = string
@@ -56,75 +56,75 @@ variable "registry_scan_filters" {
   default = []
 }
 
-# Шифрування
+# Encryption
 variable "encryption_type" {
-  description = "Тип шифрування (AES256 або KMS)"
+  description = "Encryption type (AES256 or KMS)"
   type        = string
   default     = "KMS"
 
   validation {
     condition     = contains(["AES256", "KMS"], var.encryption_type)
-    error_message = "Encryption type повинен бути AES256 або KMS."
+    error_message = "Encryption type must be AES256 or KMS."
   }
 }
 
 variable "kms_key" {
-  description = "ARN KMS ключа для шифрування (тільки для KMS типу)"
+  description = "KMS key ARN for encryption (KMS type only)"
   type        = string
   default     = null
 }
 
-# Політика життєвого циклу
+# Lifecycle policy
 variable "enable_lifecycle_policy" {
-  description = "Увімкнути політику життєвого циклу"
+  description = "Enable lifecycle policy"
   type        = bool
   default     = true
 }
 
 variable "max_image_count" {
-  description = "Максимальна кількість образів для зберігання"
+  description = "Maximum number of images to keep"
   type        = number
   default     = 10
 
   validation {
     condition     = var.max_image_count > 0 && var.max_image_count <= 1000
-    error_message = "Максимальна кількість образів повинна бути від 1 до 1000."
+    error_message = "Maximum number of images must be between 1 and 1000."
   }
 }
 
 variable "untagged_image_days" {
-  description = "Кількість днів для зберігання образів без тегів"
+  description = "Days to keep untagged images"
   type        = number
   default     = 1
 
   validation {
     condition     = var.untagged_image_days >= 1 && var.untagged_image_days <= 365
-    error_message = "Кількість днів повинна бути від 1 до 365."
+    error_message = "Number of days must be between 1 and 365."
   }
 }
 
 variable "lifecycle_tag_prefixes" {
-  description = "Префікси тегів для політики життєвого циклу"
+  description = "Tag prefixes for the lifecycle policy"
   type        = list(string)
   default     = ["v", "release", "latest"]
 }
 
-# Міжакаунтний доступ
+# Cross-account access
 variable "enable_cross_account_access" {
-  description = "Увімкнути міжакаунтний доступ"
+  description = "Enable cross-account access"
   type        = bool
   default     = false
 }
 
 variable "cross_account_arns" {
-  description = "ARN акаунтів для міжакаунтного доступу"
+  description = "Account ARNs for cross-account access"
   type        = list(string)
   default     = []
 }
 
-# Реплікація
+# Replication
 variable "replication_regions" {
-  description = "Регіони для реплікації"
+  description = "Regions to replicate to"
   type = list(object({
     region      = string
     registry_id = string
@@ -132,9 +132,9 @@ variable "replication_regions" {
   default = []
 }
 
-# Теги
+# Tags
 variable "tags" {
-  description = "Теги для ресурсів"
+  description = "Tags for resources"
   type        = map(string)
   default = {
     ManagedBy = "terraform"
@@ -142,9 +142,9 @@ variable "tags" {
   }
 }
 
-# Додаткові налаштування
+# Extra settings
 variable "force_delete" {
-  description = "Примусово видалити репозиторій навіть якщо він містить образи"
+  description = "Force delete the repository even if it contains images"
   type        = bool
   default     = false
 }

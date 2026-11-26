@@ -1,6 +1,6 @@
-# Jenkins Helm Release модуль
+# Jenkins Helm release module
 
-# Namespace для Jenkins
+# Namespace for Jenkins
 resource "kubernetes_namespace" "jenkins" {
   metadata {
     name = var.namespace
@@ -12,7 +12,7 @@ resource "kubernetes_namespace" "jenkins" {
   }
 }
 
-# Secret для Jenkins admin password
+# Secret for the Jenkins admin password
 resource "kubernetes_secret" "jenkins_admin" {
   metadata {
     name      = "jenkins-admin-secret"
@@ -26,7 +26,7 @@ resource "kubernetes_secret" "jenkins_admin" {
   type = "Opaque"
 }
 
-# PersistentVolumeClaim для Jenkins home
+# PersistentVolumeClaim for Jenkins home
 resource "kubernetes_persistent_volume_claim" "jenkins_home" {
   count = var.create_pvc ? 1 : 0
 
@@ -54,7 +54,7 @@ resource "kubernetes_persistent_volume_claim" "jenkins_home" {
   wait_until_bound = true
 }
 
-# ServiceAccount для Jenkins з необхідними правами
+# ServiceAccount for Jenkins with the required permissions
 resource "kubernetes_service_account" "jenkins" {
   metadata {
     name      = "jenkins-serviceaccount"
@@ -68,7 +68,7 @@ resource "kubernetes_service_account" "jenkins" {
   automount_service_account_token = true
 }
 
-# ClusterRole для Jenkins
+# ClusterRole for Jenkins
 resource "kubernetes_cluster_role" "jenkins" {
   metadata {
     name = "jenkins-clusterrole"
@@ -109,7 +109,7 @@ resource "kubernetes_cluster_role" "jenkins" {
   }
 }
 
-# ClusterRoleBinding для Jenkins
+# ClusterRoleBinding for Jenkins
 resource "kubernetes_cluster_role_binding" "jenkins" {
   metadata {
     name = "jenkins-clusterrolebinding"
@@ -132,7 +132,7 @@ resource "kubernetes_cluster_role_binding" "jenkins" {
   }
 }
 
-# ConfigMap для додаткових Jenkins конфігурацій
+# ConfigMap for extra Jenkins configuration
 resource "kubernetes_config_map" "jenkins_config" {
   count = length(var.jenkins_config_files) > 0 ? 1 : 0
 
@@ -148,7 +148,7 @@ resource "kubernetes_config_map" "jenkins_config" {
   data = var.jenkins_config_files
 }
 
-# Helm Release для Jenkins
+# Helm release for Jenkins
 resource "helm_release" "jenkins" {
   name       = var.release_name
   repository = var.helm_repository
@@ -156,13 +156,13 @@ resource "helm_release" "jenkins" {
   version    = var.helm_chart_version
   namespace  = kubernetes_namespace.jenkins.metadata[0].name
 
-  # Використання values.yaml файлу
+  # Use the values.yaml file
   values = [
     file("${path.module}/values.yaml"),
     var.additional_values
   ]
 
-  # Динамічні значення
+  # Dynamic values
   set {
     name  = "controller.adminPassword"
     value = var.admin_password
@@ -254,7 +254,7 @@ resource "helm_release" "jenkins" {
     value = var.service_type
   }
 
-  # Додаткові налаштування для AWS
+  # Extra AWS settings
   dynamic "set" {
     for_each = var.aws_region != "" ? [1] : []
     content {
@@ -263,7 +263,7 @@ resource "helm_release" "jenkins" {
     }
   }
 
-  # Налаштування для ECR
+  # ECR settings
   dynamic "set" {
     for_each = var.ecr_registry_url != "" ? [1] : []
     content {
@@ -280,7 +280,7 @@ resource "helm_release" "jenkins" {
     }
   }
 
-  # Налаштування безпеки
+  # Security settings
   set {
     name  = "controller.runAsUser"
     value = "1000"
@@ -291,7 +291,7 @@ resource "helm_release" "jenkins" {
     value = "1000"
   }
 
-  # Налаштування для plugins
+  # Plugin settings
   dynamic "set" {
     for_each = var.install_plugins
     content {
@@ -309,12 +309,12 @@ resource "helm_release" "jenkins" {
 
   timeout = var.helm_timeout
 
-  # Очікування готовності
+  # Wait until ready
   wait          = true
   wait_for_jobs = true
 }
 
-# Service для доступу до Jenkins (якщо потрібен LoadBalancer)
+# Service to access Jenkins (if a LoadBalancer is needed)
 resource "kubernetes_service" "jenkins_lb" {
   count = var.service_type == "LoadBalancer" && var.create_load_balancer_service ? 1 : 0
 
@@ -347,7 +347,7 @@ resource "kubernetes_service" "jenkins_lb" {
   }
 }
 
-# Ingress для Jenkins (якщо увімкнено)
+# Ingress for Jenkins (if enabled)
 resource "kubernetes_ingress_v1" "jenkins" {
   count = var.ingress_enabled && var.create_custom_ingress ? 1 : 0
 
@@ -399,7 +399,7 @@ resource "kubernetes_ingress_v1" "jenkins" {
   }
 }
 
-# HorizontalPodAutoscaler для Jenkins (опціонально)
+# HorizontalPodAutoscaler for Jenkins (optional)
 resource "kubernetes_horizontal_pod_autoscaler_v2" "jenkins" {
   count = var.enable_hpa ? 1 : 0
 

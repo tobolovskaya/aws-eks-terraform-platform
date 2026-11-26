@@ -17,7 +17,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8000:8000"   # можна відкрити напряму, nginx працюватиме на 80
+      - "8000:8000"   # can be opened directly, nginx will listen on 80
 
   db:
     image: postgres:15

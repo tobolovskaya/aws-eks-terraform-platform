@@ -1,5 +1,5 @@
-# Налаштування моніторингу (Prometheus + Grafana)
-# Цей файл використовується для початкового налаштування моніторингу
+# Monitoring setup (Prometheus + Grafana)
+# This file is used for the initial monitoring setup
 
 terraform {
   required_version = ">= 1.0"
@@ -15,7 +15,7 @@ terraform {
   }
 }
 
-# Namespace для моніторингу
+# Namespace for monitoring
 resource "kubernetes_namespace" "monitoring" {
   metadata {
     name = "monitoring"
@@ -25,7 +25,7 @@ resource "kubernetes_namespace" "monitoring" {
   }
 }
 
-# Helm release для Prometheus + Grafana
+# Helm release for Prometheus + Grafana
 resource "helm_release" "prometheus_stack" {
   name       = "prometheus"
   repository = "https://prometheus-community.github.io/helm-charts"
@@ -58,39 +58,39 @@ resource "helm_release" "prometheus_stack" {
   depends_on = [kubernetes_namespace.monitoring]
 }
 
-# Змінні для моніторингу
+# Monitoring variables
 variable "grafana_admin_password" {
-  description = "Пароль адміністратора Grafana"
+  description = "Grafana admin password"
   type        = string
   sensitive   = true
   default     = "admin123"
 }
 
 variable "grafana_ingress_enabled" {
-  description = "Увімкнути Ingress для Grafana"
+  description = "Enable Ingress for Grafana"
   type        = bool
   default     = false
 }
 
 variable "grafana_ingress_hostname" {
-  description = "Hostname для Grafana Ingress"
+  description = "Hostname for the Grafana Ingress"
   type        = string
   default     = "grafana.local"
 }
 
-# Виводи
+# Outputs
 output "grafana_admin_password" {
-  description = "Пароль адміністратора Grafana"
+  description = "Grafana admin password"
   value       = var.grafana_admin_password
   sensitive   = true
 }
 
 output "prometheus_url" {
-  description = "URL для доступу до Prometheus"
-  value       = "http://localhost:9090 (використовуйте kubectl port-forward)"
+  description = "URL to access Prometheus"
+  value       = "http://localhost:9090 (use kubectl port-forward)"
 }
 
 output "grafana_url" {
-  description = "URL для доступу до Grafana"
-  value       = "http://localhost:3000 (використовуйте kubectl port-forward)"
+  description = "URL to access Grafana"
+  value       = "http://localhost:3000 (use kubectl port-forward)"
 }

@@ -1,46 +1,46 @@
-# Створення Aurora кластера бази даних
+# Create the Aurora database cluster
 
 # Aurora Cluster
 resource "aws_rds_cluster" "main" {
   #checkov:skip=CKV2_AWS_8: automated RDS backups (backup_retention_period) are used instead of a separate AWS Backup plan
   count = var.use_aurora ? 1 : 0
 
-  # Основні параметри
+  # Basic parameters
   cluster_identifier = "${var.tags.Project}-aurora-cluster"
   engine             = local.aurora_engine
   engine_version     = local.default_engine_version
 
-  # База даних
+  # Database
   database_name   = var.database_name
   master_username = var.username
   master_password = var.password
   port            = local.default_port
 
-  # Мережа та безпека
+  # Network and security
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.db.id]
 
-  # Параметри
+  # Parameters
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.main[0].name
 
-  # Бекапи та обслуговування
+  # Backups and maintenance
   backup_retention_period      = var.backup_retention_period
   preferred_backup_window      = var.backup_window
   preferred_maintenance_window = var.maintenance_window
   skip_final_snapshot          = var.skip_final_snapshot
   final_snapshot_identifier    = var.skip_final_snapshot ? null : "${var.tags.Project}-aurora-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
 
-  # Захист
+  # Protection
   deletion_protection   = var.deletion_protection
   copy_tags_to_snapshot = true
 
-  # Шифрування
+  # Encryption
   storage_encrypted = var.storage_encrypted
 
-  # Логи
+  # Logs
   enabled_cloudwatch_logs_exports = local.logs_exports
 
-  # Serverless v2 налаштування
+  # Serverless v2 settings
   dynamic "serverlessv2_scaling_configuration" {
     for_each = var.aurora_serverless_v2 ? [1] : []
     content {
@@ -77,14 +77,14 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   engine             = aws_rds_cluster.main[0].engine
   engine_version     = aws_rds_cluster.main[0].engine_version
 
-  # Моніторинг
+  # Monitoring
   monitoring_interval = var.monitoring_interval
   monitoring_role_arn = var.monitoring_interval > 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
 
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_enabled ? 7 : null
 
-  # Автоматичні оновлення
+  # Automatic upgrades
   auto_minor_version_upgrade = true
 
   tags = merge(var.tags, {

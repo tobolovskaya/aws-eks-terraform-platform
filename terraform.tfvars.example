@@ -1,38 +1,38 @@
-# Приклад файлу terraform.tfvars
-# Скопіюйте цей файл як terraform.tfvars та заповніть своїми значеннями
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and fill in your own values
 
-# AWS налаштування
+# AWS settings
 aws_region = "us-west-2"
 
-# VPC налаштування
+# VPC settings
 vpc_cidr = "10.0.0.0/16"
 availability_zones = ["us-west-2a", "us-west-2b"]
 public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
 
-# RDS налаштування
-use_aurora = false  # true для Aurora, false для звичайної RDS
+# RDS settings
+use_aurora = false  # true for Aurora, false for a regular RDS instance
 db_engine = "postgres"  # postgres, mysql, mariadb
 db_engine_version = "15.4"
 db_instance_class = "db.t3.micro"
 
-# База даних
+# Database
 database_name = "myapp"
 db_username = "dbadmin"
-db_password = "your-secure-password-here"  # ЗМІНІТЬ НА БЕЗПЕЧНИЙ ПАРОЛЬ!
+db_password = "your-secure-password-here"  # CHANGE TO A STRONG PASSWORD!
 
-# Додаткові налаштування
+# Extra settings
 multi_az = false
 backup_retention_period = 7
 backup_window = "03:00-04:00"
 maintenance_window = "sun:04:00-sun:05:00"
 
-# EKS налаштування
+# EKS settings
 eks_cluster_name = "my-eks-cluster"
 kubernetes_version = "1.35"
 enable_ebs_csi_driver = true
 
-# Node Groups конфігурація
+# Node groups configuration
 node_groups = [
   {
     name                        = "main"
@@ -45,7 +45,7 @@ node_groups = [
     max_unavailable_percentage = 25
     disk_size                  = 50
     disk_type                  = "gp3"
-    subnet_ids                 = []  # Буде заповнено автоматично
+    subnet_ids                 = []  # Filled in automatically
     labels                     = {
       Environment = "dev"
       NodeGroup   = "main"
@@ -54,7 +54,7 @@ node_groups = [
   }
 ]
 
-# ECR налаштування
+# ECR settings
 ecr_repository_name = "my-app"
 ecr_image_tag_mutability = "IMMUTABLE"  # MUTABLE or IMMUTABLE
 ecr_scan_on_push = true
@@ -66,7 +66,7 @@ ecr_untagged_image_days = 1
 ecr_enable_cross_account_access = false
 ecr_cross_account_arns = []
 
-# Теги
+# Tags
 common_tags = {
   Environment = "dev"
   Project     = "terraform-rds-module"
@@ -74,14 +74,14 @@ common_tags = {
   Owner       = "your-name"
 }
 
-# Jenkins налаштування
+# Jenkins settings
 jenkins_release_name = "jenkins"
 jenkins_namespace = "jenkins"
 jenkins_helm_chart_version = "4.8.3"
 jenkins_admin_user = "admin"
-jenkins_admin_password = "your-secure-jenkins-password"  # ЗМІНІТЬ НА БЕЗПЕЧНИЙ ПАРОЛЬ!
+jenkins_admin_password = "your-secure-jenkins-password"  # CHANGE TO A STRONG PASSWORD!
 
-# Jenkins ресурси
+# Jenkins resources
 jenkins_resources = {
   requests = {
     cpu    = "500m"
@@ -93,22 +93,22 @@ jenkins_resources = {
   }
 }
 
-# Jenkins сховище
+# Jenkins storage
 jenkins_persistence_enabled = true
 jenkins_storage_size = "20Gi"
 jenkins_storage_class = "gp3"
 jenkins_create_pvc = true
 
-# Jenkins мережа
+# Jenkins network
 jenkins_service_type = "ClusterIP"
 jenkins_create_load_balancer_service = false
 jenkins_ingress_enabled = true
-jenkins_ingress_hostname = "jenkins.yourdomain.com"  # ЗМІНІТЬ НА ВАШ ДОМЕН!
+jenkins_ingress_hostname = "jenkins.yourdomain.com"  # CHANGE TO YOUR DOMAIN!
 jenkins_ingress_class_name = "nginx"
 jenkins_ingress_tls_enabled = true
 jenkins_ingress_tls_secret_name = "jenkins-tls"
 
-# Jenkins плагіни
+# Jenkins plugins
 jenkins_install_plugins = [
   "kubernetes:4029.v5712230ccb_f8",
   "workflow-aggregator:596.v8c21c963d92d",
@@ -122,14 +122,14 @@ jenkins_install_plugins = [
   "slack:631.v40deea_40323b"
 ]
 
-# Jenkins автоскейлінг
+# Jenkins autoscaling
 jenkins_enable_hpa = false
 jenkins_hpa_min_replicas = 1
 jenkins_hpa_max_replicas = 3
 jenkins_hpa_target_cpu_utilization = 70
 jenkins_hpa_target_memory_utilization = 80
 
-# Jenkins моніторинг
+# Jenkins monitoring
 jenkins_enable_prometheus_monitoring = true
 jenkins_prometheus_scrape_interval = "30s"
 
@@ -138,20 +138,20 @@ jenkins_enable_backup = false
 jenkins_backup_schedule = "0 2 * * *"
 jenkins_backup_retention_days = 30
 
-# Jenkins додаткові налаштування
+# Jenkins extra settings
 jenkins_timezone = "Europe/Kiev"
 jenkins_java_opts = "-Xmx2g -Xms1g"
 jenkins_enable_csrf_protection = true
 jenkins_enable_script_security = true
 jenkins_agent_connection_timeout = 100
 
-# Argo CD налаштування
+# Argo CD settings
 argocd_release_name = "argocd"
 argocd_namespace = "argocd"
 argocd_helm_chart_version = "5.51.6"
-argocd_admin_password = "your-secure-argocd-password"  # ЗМІНІТЬ НА БЕЗПЕЧНИЙ ПАРОЛЬ!
+argocd_admin_password = "your-secure-argocd-password"  # CHANGE TO A STRONG PASSWORD!
 
-# Argo CD ресурси
+# Argo CD resources
 argocd_controller_resources = {
   requests = {
     cpu    = "250m"
@@ -191,29 +191,29 @@ argocd_controller_replicas = 1
 argocd_server_replicas = 2
 argocd_repo_server_replicas = 2
 
-# Argo CD мережа
+# Argo CD network
 argocd_service_type = "ClusterIP"
 argocd_create_load_balancer_service = false
 argocd_ingress_enabled = true
-argocd_ingress_hostname = "argocd.yourdomain.com"  # ЗМІНІТЬ НА ВАШ ДОМЕН!
+argocd_ingress_hostname = "argocd.yourdomain.com"  # CHANGE TO YOUR DOMAIN!
 argocd_ingress_class_name = "nginx"
 argocd_ingress_tls_enabled = true
 argocd_ingress_tls_secret_name = "argocd-tls"
 
-# Argo CD функціональність
+# Argo CD features
 argocd_enable_metrics = true
 argocd_enable_notifications = true
 argocd_enable_applicationset = true
 argocd_enable_dex = false
 
-# Argo CD автоскейлінг
+# Argo CD autoscaling
 argocd_enable_hpa = false
 argocd_hpa_min_replicas = 2
 argocd_hpa_max_replicas = 5
 argocd_hpa_target_cpu_utilization = 70
 argocd_hpa_target_memory_utilization = 80
 
-# Argo CD моніторинг
+# Argo CD monitoring
 argocd_enable_prometheus_monitoring = true
 argocd_prometheus_scrape_interval = "30s"
 
@@ -236,7 +236,7 @@ argocd_app_project_source_repos = ["*"]
 argocd_app_project_admin_groups = []
 argocd_app_project_developer_groups = []
 
-# Argo CD додаткові налаштування
+# Argo CD extra settings
 argocd_timezone = "Europe/Kiev"
 argocd_log_level = "info"
 argocd_log_format = "text"
@@ -246,7 +246,7 @@ argocd_enable_webhooks = true
 argocd_webhook_github_secret = ""
 argocd_webhook_gitlab_secret = ""
 
-# Моніторинг налаштування
-grafana_admin_password = "secure-grafana-password"  # ЗМІНІТЬ НА БЕЗПЕЧНИЙ ПАРОЛЬ!
+# Monitoring settings
+grafana_admin_password = "secure-grafana-password"  # CHANGE TO A STRONG PASSWORD!
 grafana_ingress_enabled = false
-grafana_ingress_hostname = "grafana.yourdomain.com"  # ЗМІНІТЬ НА ВАШ ДОМЕН!
+grafana_ingress_hostname = "grafana.yourdomain.com"  # CHANGE TO YOUR DOMAIN!

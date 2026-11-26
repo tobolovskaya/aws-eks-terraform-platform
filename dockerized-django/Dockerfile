@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Копіюємо весь код (поки що порожній, далі згенеруємо startproject)
+# Copy all the code (empty for now, startproject will generate it next)
 COPY app /app/app
 
-# Стандартний порт Django/ Gunicorn
+# Default Django / Gunicorn port
 EXPOSE 8000
 
 CMD ["bash", "-lc", \

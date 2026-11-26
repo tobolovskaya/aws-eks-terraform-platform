@@ -1,6 +1,6 @@
-# Встановлення AWS EBS CSI Driver для EKS
+# Install the AWS EBS CSI Driver for EKS
 
-# IAM роль для EBS CSI Driver
+# IAM role for the EBS CSI Driver
 resource "aws_iam_role" "ebs_csi_driver" {
   count = var.enable_ebs_csi_driver ? 1 : 0
 
@@ -28,7 +28,7 @@ resource "aws_iam_role" "ebs_csi_driver" {
   tags = var.tags
 }
 
-# Прикріплення політики до ролі EBS CSI Driver
+# Attach the policy to the EBS CSI Driver role
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   count = var.enable_ebs_csi_driver ? 1 : 0
 
@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   role       = aws_iam_role.ebs_csi_driver[0].name
 }
 
-# Додаткова політика для EBS CSI Driver (для кастомних KMS ключів)
+# Extra policy for the EBS CSI Driver (for custom KMS keys)
 resource "aws_iam_role_policy" "ebs_csi_driver_kms" {
   count = var.enable_ebs_csi_driver && var.ebs_csi_kms_key_id != "" ? 1 : 0
 
@@ -75,7 +75,7 @@ resource "aws_iam_role_policy" "ebs_csi_driver_kms" {
   })
 }
 
-# EKS Add-on для EBS CSI Driver
+# EKS add-on for the EBS CSI Driver
 resource "aws_eks_addon" "ebs_csi_driver" {
   count = var.enable_ebs_csi_driver ? 1 : 0
 
@@ -94,7 +94,7 @@ resource "aws_eks_addon" "ebs_csi_driver" {
   ]
 }
 
-# Storage Class для gp3 (рекомендований)
+# Storage class for gp3 (recommended)
 resource "kubernetes_storage_class" "gp3" {
   count = var.enable_ebs_csi_driver && var.create_storage_classes ? 1 : 0
 
@@ -118,7 +118,7 @@ resource "kubernetes_storage_class" "gp3" {
   depends_on = [aws_eks_addon.ebs_csi_driver]
 }
 
-# Storage Class для gp2 (для сумісності)
+# Storage class for gp2 (for compatibility)
 resource "kubernetes_storage_class" "gp2" {
   count = var.enable_ebs_csi_driver && var.create_storage_classes ? 1 : 0
 
@@ -142,7 +142,7 @@ resource "kubernetes_storage_class" "gp2" {
   depends_on = [aws_eks_addon.ebs_csi_driver]
 }
 
-# Storage Class для io1 (високопродуктивний)
+# Storage class for io1 (high performance)
 resource "kubernetes_storage_class" "io1" {
   count = var.enable_ebs_csi_driver && var.create_storage_classes ? 1 : 0
 
@@ -164,7 +164,7 @@ resource "kubernetes_storage_class" "io1" {
   depends_on = [aws_eks_addon.ebs_csi_driver]
 }
 
-# Storage Class з кастомним KMS ключем
+# Storage class with a custom KMS key
 resource "kubernetes_storage_class" "encrypted_gp3" {
   count = var.enable_ebs_csi_driver && var.create_storage_classes && var.ebs_csi_kms_key_id != "" ? 1 : 0
 
@@ -186,7 +186,7 @@ resource "kubernetes_storage_class" "encrypted_gp3" {
   depends_on = [aws_eks_addon.ebs_csi_driver]
 }
 
-# Видалення старого storage class (якщо потрібно)
+# Remove the old storage class (if needed)
 resource "kubernetes_annotations" "default_storageclass" {
   count = var.enable_ebs_csi_driver && var.remove_default_gp2_storage_class ? 1 : 0
 
