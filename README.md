@@ -55,7 +55,7 @@ flowchart LR
 | `modules/jenkins` | Jenkins via Helm, IRSA role for build agents | CI with short-lived, narrowly scoped AWS access |
 | `modules/argo_cd` | Argo CD via Helm, ApplicationSet | GitOps: the cluster follows Git |
 | `modules/monitoring` | kube-prometheus-stack | Metrics and dashboards |
-| `charts/django-app`, `Django/` | Helm chart, Dockerfile, Jenkinsfile | Sample application |
+| `charts/django-app`, `Django/` | Helm chart, app code, Dockerfile, Jenkinsfile | Sample application with `/health/` and `/ready/` probes |
 
 ## Security hardening log
 
@@ -74,6 +74,7 @@ Checkov findings went from **33 to 0**: 18 fixed in code, 15 skipped with a writ
 | [#17](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/17) | Immutable, KMS-encrypted ECR; locked default SG; VPC flow logs; SG descriptions; no DB egress; KMS for state | Tags cannot be overwritten, traffic is logged for incident response, least privilege on the network | CKV_AWS_51, 136, 145, 23, 382, CKV2_AWS_11, 12, 61 |
 | #18 | Remaining findings skipped with reasons, CI scan blocking | Accepted risks are documented, not hidden; new findings now fail the build | 15 skips |
 | #21 | RDS master password managed by Secrets Manager (`manage_master_user_password`) | The password is generated and rotated by AWS and never appears in variables, plans or Terraform state | |
+| #23 | One Django folder; secret key, debug and database settings from environment variables; health and readiness endpoints | The image build referenced a missing folder, the secret key and `DEBUG = True` were hardcoded, and the Kubernetes probes pointed to URLs that did not exist | |
 
 Other defaults:
 
@@ -145,8 +146,7 @@ checkov -d . --framework terraform --compact --quiet
 ├── modules/
 │   ├── vpc/  eks/  rds/  ecr/  jenkins/  argo_cd/  monitoring/  s3-backend/
 ├── charts/django-app/                # Helm chart for the sample app
-├── Django/                           # Dockerfile, Jenkinsfile
-└── dockerized-django/                # local Docker Compose setup
+└── Django/                           # sample app: code, Dockerfile, Jenkinsfile, local Docker Compose
 ```
 
 ## Roadmap

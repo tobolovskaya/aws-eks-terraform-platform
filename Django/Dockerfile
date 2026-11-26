@@ -27,9 +27,7 @@ USER appuser
 # Expose the port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health/ || exit 1
+# Health is checked by Kubernetes probes (/health/ and /ready/), not by Docker
 
 # Start command
 CMD ["bash", "-c", "cd app && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000"]
