@@ -1,71 +1,71 @@
-# Змінні для EKS модуля
+# Variables for the EKS module
 
-# Основні параметри кластера
+# Basic cluster parameters
 variable "cluster_name" {
-  description = "Назва EKS кластера"
+  description = "EKS cluster name"
   type        = string
 
   validation {
     condition     = can(regex("^[a-zA-Z][a-zA-Z0-9-]*$", var.cluster_name))
-    error_message = "Назва кластера повинна починатися з літери та містити тільки літери, цифри та дефіси."
+    error_message = "Cluster name must start with a letter and contain only letters, digits and hyphens."
   }
 }
 
 variable "kubernetes_version" {
-  description = "Версія Kubernetes"
+  description = "Kubernetes version"
   type        = string
   default     = "1.35"
 
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+$", var.kubernetes_version))
-    error_message = "Версія Kubernetes повинна бути у форматі X.Y (наприклад, 1.28)."
+    error_message = "Kubernetes version must be in X.Y format (for example 1.35)."
   }
 }
 
-# Мережеві параметри
+# Network parameters
 variable "vpc_id" {
-  description = "ID VPC для EKS кластера"
+  description = "VPC ID for the EKS cluster"
   type        = string
 }
 
 variable "subnet_ids" {
-  description = "Список ID підмереж для EKS кластера"
+  description = "List of subnet IDs for the EKS cluster"
   type        = list(string)
 
   validation {
     condition     = length(var.subnet_ids) >= 2
-    error_message = "Потрібно мінімум 2 підмережі для EKS кластера."
+    error_message = "At least 2 subnets are required for the EKS cluster."
   }
 }
 
 variable "allowed_cidr_blocks" {
-  description = "CIDR блоки, яким дозволено доступ до API сервера"
+  description = "CIDR blocks allowed to reach the API server"
   type        = list(string)
   default     = []
 }
 
-# Налаштування endpoint
+# Endpoint settings
 variable "endpoint_private_access" {
-  description = "Увімкнути приватний доступ до API endpoint"
+  description = "Enable private access to the API endpoint"
   type        = bool
   default     = true
 }
 
 variable "endpoint_public_access" {
-  description = "Увімкнути публічний доступ до API endpoint"
+  description = "Enable public access to the API endpoint"
   type        = bool
   default     = false
 }
 
 variable "endpoint_public_access_cidrs" {
-  description = "CIDR блоки для публічного доступу до API endpoint"
+  description = "CIDR blocks for public access to the API endpoint"
   type        = list(string)
   default     = []
 }
 
-# Логування
+# Logging
 variable "cluster_log_types" {
-  description = "Типи логів для увімкнення в CloudWatch"
+  description = "Log types to enable in CloudWatch"
   type        = list(string)
   default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
@@ -75,20 +75,20 @@ variable "cluster_log_types" {
         "api", "audit", "authenticator", "controllerManager", "scheduler"
       ], log_type)
     ])
-    error_message = "Дозволені типи логів: api, audit, authenticator, controllerManager, scheduler."
+    error_message = "Allowed log types: api, audit, authenticator, controllerManager, scheduler."
   }
 }
 
-# Шифрування
+# Encryption
 variable "cluster_encryption_config_kms_key_id" {
   description = "ARN of an existing KMS key for EKS secrets encryption. Leave empty to create a new key."
   type        = string
   default     = ""
 }
 
-# Node Groups конфігурація
+# Node groups configuration
 variable "node_groups" {
-  description = "Конфігурація node groups"
+  description = "Node groups configuration"
   type = list(object({
     name                       = string
     instance_types             = list(string)
@@ -131,7 +131,7 @@ variable "node_groups" {
     condition = alltrue([
       for ng in var.node_groups : ng.min_size <= ng.desired_size && ng.desired_size <= ng.max_size
     ])
-    error_message = "Для кожної node group: min_size <= desired_size <= max_size."
+    error_message = "For each node group: min_size <= desired_size <= max_size."
   }
 
   validation {
@@ -140,94 +140,94 @@ variable "node_groups" {
         "AL2023_x86_64_STANDARD", "AL2023_ARM_64_STANDARD", "AL2023_x86_64_NVIDIA", "CUSTOM", "BOTTLEROCKET_ARM_64", "BOTTLEROCKET_x86_64"
       ], ng.ami_type)
     ])
-    error_message = "AMI type повинен бути одним з підтримуваних типів."
+    error_message = "AMI type must be one of the supported types."
   }
 
   validation {
     condition = alltrue([
       for ng in var.node_groups : contains(["ON_DEMAND", "SPOT"], ng.capacity_type)
     ])
-    error_message = "Capacity type повинен бути ON_DEMAND або SPOT."
+    error_message = "Capacity type must be ON_DEMAND or SPOT."
   }
 }
 
-# EBS CSI Driver налаштування
+# EBS CSI Driver settings
 variable "enable_ebs_csi_driver" {
-  description = "Увімкнути AWS EBS CSI Driver"
+  description = "Enable the AWS EBS CSI Driver"
   type        = bool
   default     = true
 }
 
 variable "ebs_csi_driver_version" {
-  description = "Версія EBS CSI Driver addon"
+  description = "EBS CSI Driver add-on version"
   type        = string
   default     = null
 }
 
 variable "ebs_csi_kms_key_id" {
-  description = "ARN KMS ключа для шифрування EBS томів"
+  description = "KMS key ARN to encrypt EBS volumes"
   type        = string
   default     = ""
 }
 
 variable "create_storage_classes" {
-  description = "Створити storage classes для EBS CSI Driver"
+  description = "Create storage classes for the EBS CSI Driver"
   type        = bool
   default     = true
 }
 
 variable "set_gp3_as_default_storage_class" {
-  description = "Встановити gp3 як default storage class"
+  description = "Make gp3 the default storage class"
   type        = bool
   default     = true
 }
 
 variable "remove_default_gp2_storage_class" {
-  description = "Видалити default annotation з gp2 storage class"
+  description = "Remove the default annotation from the gp2 storage class"
   type        = bool
   default     = true
 }
 
-# Додаткові add-ons
+# Extra add-ons
 variable "enable_vpc_cni_addon" {
-  description = "Увімкнути VPC CNI addon"
+  description = "Enable the VPC CNI add-on"
   type        = bool
   default     = true
 }
 
 variable "vpc_cni_addon_version" {
-  description = "Версія VPC CNI addon"
+  description = "VPC CNI add-on version"
   type        = string
   default     = null
 }
 
 variable "enable_coredns_addon" {
-  description = "Увімкнути CoreDNS addon"
+  description = "Enable the CoreDNS add-on"
   type        = bool
   default     = true
 }
 
 variable "coredns_addon_version" {
-  description = "Версія CoreDNS addon"
+  description = "CoreDNS add-on version"
   type        = string
   default     = null
 }
 
 variable "enable_kube_proxy_addon" {
-  description = "Увімкнути kube-proxy addon"
+  description = "Enable the kube-proxy add-on"
   type        = bool
   default     = true
 }
 
 variable "kube_proxy_addon_version" {
-  description = "Версія kube-proxy addon"
+  description = "kube-proxy add-on version"
   type        = string
   default     = null
 }
 
-# Теги
+# Tags
 variable "tags" {
-  description = "Теги для ресурсів"
+  description = "Tags for resources"
   type        = map(string)
   default = {
     ManagedBy = "terraform"

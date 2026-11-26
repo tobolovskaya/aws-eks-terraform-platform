@@ -1,4 +1,4 @@
-# Провайдери для Argo CD модуля
+# Providers for the Argo CD module
 
 terraform {
   required_version = ">= 1.0"
@@ -16,14 +16,14 @@ terraform {
   }
 }
 
-# Kubernetes провайдер
-# Конфігурація повинна бути передана з головного модуля
+# Kubernetes provider
+# Configuration must be passed in from the root module
 # provider "kubernetes" {
 #   host                   = var.cluster_endpoint
 #   cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
 #   token                  = var.cluster_token
 # 
-#   # Або використання AWS EKS
+#   # Or use AWS EKS
 #   exec {
 #     api_version = "client.authentication.k8s.io/v1beta1"
 #     command     = "aws"
@@ -38,15 +38,15 @@ terraform {
 #   }
 # }
 
-# Helm провайдер
-# Конфігурація повинна бути передана з головного модуля
+# Helm provider
+# Configuration must be passed in from the root module
 # provider "helm" {
 #   kubernetes {
 #     host                   = var.cluster_endpoint
 #     cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
 #     token                  = var.cluster_token
 # 
-#     # Або використання AWS EKS
+#     # Or use AWS EKS
 #     exec {
 #       api_version = "client.authentication.k8s.io/v1beta1"
 #       command     = "aws"

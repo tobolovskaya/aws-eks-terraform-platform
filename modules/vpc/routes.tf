@@ -1,6 +1,6 @@
-# Налаштування маршрутизації
+# Routing settings
 
-# Route table для публічних підмереж
+# Route table for public subnets
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -14,7 +14,7 @@ resource "aws_route_table" "public" {
   })
 }
 
-# Асоціація публічних підмереж з route table
+# Associate public subnets with the route table
 resource "aws_route_table_association" "public" {
   count = length(aws_subnet.public)
 
@@ -22,7 +22,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Route table для приватних підмереж
+# Route table for private subnets
 resource "aws_route_table" "private" {
   count = length(aws_subnet.private)
 
@@ -38,7 +38,7 @@ resource "aws_route_table" "private" {
   })
 }
 
-# Асоціація приватних підмереж з route table
+# Associate private subnets with the route table
 resource "aws_route_table_association" "private" {
   count = length(aws_subnet.private)
 

@@ -1,91 +1,91 @@
-# Змінні для Jenkins модуля
+# Variables for the Jenkins module
 
-# Основні параметри
+# Basic parameters
 variable "release_name" {
-  description = "Назва Helm release для Jenkins"
+  description = "Helm release name for Jenkins"
   type        = string
   default     = "jenkins"
 
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.release_name))
-    error_message = "Release name повинна містити тільки малі літери, цифри та дефіси."
+    error_message = "Release name may only contain lowercase letters, digits and hyphens."
   }
 }
 
 variable "namespace" {
-  description = "Kubernetes namespace для Jenkins"
+  description = "Kubernetes namespace for Jenkins"
   type        = string
   default     = "jenkins"
 
   validation {
     condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.namespace))
-    error_message = "Namespace повинен містити тільки малі літери, цифри та дефіси."
+    error_message = "Namespace may only contain lowercase letters, digits and hyphens."
   }
 }
 
-# Helm налаштування
+# Helm settings
 variable "helm_repository" {
-  description = "Helm repository URL для Jenkins chart"
+  description = "Helm repository URL for the Jenkins chart"
   type        = string
   default     = "https://charts.jenkins.io"
 }
 
 variable "helm_chart" {
-  description = "Назва Helm chart для Jenkins"
+  description = "Helm chart name for Jenkins"
   type        = string
   default     = "jenkins"
 }
 
 variable "helm_chart_version" {
-  description = "Версія Helm chart для Jenkins"
+  description = "Helm chart version for Jenkins"
   type        = string
   default     = "4.8.3"
 }
 
 variable "helm_timeout" {
-  description = "Timeout для Helm операцій (секунди)"
+  description = "Timeout for Helm operations (seconds)"
   type        = number
   default     = 600
 
   validation {
     condition     = var.helm_timeout >= 300 && var.helm_timeout <= 1800
-    error_message = "Helm timeout повинен бути від 300 до 1800 секунд."
+    error_message = "Helm timeout must be between 300 and 1800 seconds."
   }
 }
 
-# Jenkins конфігурація
+# Jenkins configuration
 variable "admin_user" {
-  description = "Ім'я адміністратора Jenkins"
+  description = "Jenkins admin username"
   type        = string
   default     = "admin"
 }
 
 variable "admin_password" {
-  description = "Пароль адміністратора Jenkins"
+  description = "Jenkins admin password"
   type        = string
   sensitive   = true
 
   validation {
     condition     = length(var.admin_password) >= 8
-    error_message = "Пароль адміністратора повинен містити мінімум 8 символів."
+    error_message = "Admin password must be at least 8 characters long."
   }
 }
 
 variable "jenkins_config_files" {
-  description = "Додаткові конфігураційні файли для Jenkins"
+  description = "Extra configuration files for Jenkins"
   type        = map(string)
   default     = {}
 }
 
 variable "additional_values" {
-  description = "Додаткові Helm values у YAML форматі"
+  description = "Extra Helm values in YAML format"
   type        = string
   default     = ""
 }
 
-# Ресурси
+# Resources
 variable "resources" {
-  description = "Ресурси для Jenkins controller"
+  description = "Resources for the Jenkins controller"
   type = object({
     requests = object({
       cpu    = string
@@ -108,51 +108,51 @@ variable "resources" {
   }
 }
 
-# Сховище
+# Storage
 variable "persistence_enabled" {
-  description = "Увімкнути persistent storage для Jenkins"
+  description = "Enable persistent storage for Jenkins"
   type        = bool
   default     = true
 }
 
 variable "storage_size" {
-  description = "Розмір сховища для Jenkins home"
+  description = "Storage size for Jenkins home"
   type        = string
   default     = "20Gi"
 }
 
 variable "storage_class" {
-  description = "Storage class для Jenkins PVC"
+  description = "Storage class for the Jenkins PVC"
   type        = string
   default     = "gp3"
 }
 
 variable "create_pvc" {
-  description = "Створити PVC для Jenkins (якщо false, використовується динамічне створення)"
+  description = "Create a PVC for Jenkins (if false, it is provisioned dynamically)"
   type        = bool
   default     = true
 }
 
-# Мережеві налаштування
+# Network settings
 variable "service_type" {
-  description = "Тип Kubernetes service для Jenkins"
+  description = "Kubernetes service type for Jenkins"
   type        = string
   default     = "ClusterIP"
 
   validation {
     condition     = contains(["ClusterIP", "NodePort", "LoadBalancer"], var.service_type)
-    error_message = "Service type повинен бути ClusterIP, NodePort або LoadBalancer."
+    error_message = "Service type must be ClusterIP, NodePort or LoadBalancer."
   }
 }
 
 variable "create_load_balancer_service" {
-  description = "Створити додатковий LoadBalancer service"
+  description = "Create an extra LoadBalancer service"
   type        = bool
   default     = false
 }
 
 variable "load_balancer_annotations" {
-  description = "Анотації для LoadBalancer service"
+  description = "Annotations for the LoadBalancer service"
   type        = map(string)
   default = {
     "service.beta.kubernetes.io/aws-load-balancer-type"   = "nlb"
@@ -161,26 +161,26 @@ variable "load_balancer_annotations" {
 }
 
 variable "load_balancer_source_ranges" {
-  description = "CIDR блоки для доступу до LoadBalancer"
+  description = "CIDR blocks allowed to reach the LoadBalancer"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
-# Ingress налаштування
+# Ingress settings
 variable "ingress_enabled" {
-  description = "Увімкнути Ingress для Jenkins"
+  description = "Enable Ingress for Jenkins"
   type        = bool
   default     = true
 }
 
 variable "create_custom_ingress" {
-  description = "Створити кастомний Ingress ресурс"
+  description = "Create a custom Ingress resource"
   type        = bool
   default     = false
 }
 
 variable "ingress_hostname" {
-  description = "Hostname для Jenkins Ingress"
+  description = "Hostname for the Jenkins Ingress"
   type        = string
   default     = "jenkins.local"
 }
@@ -192,7 +192,7 @@ variable "ingress_class_name" {
 }
 
 variable "ingress_annotations" {
-  description = "Додаткові анотації для Ingress"
+  description = "Extra annotations for the Ingress"
   type        = map(string)
   default = {
     "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
@@ -200,20 +200,20 @@ variable "ingress_annotations" {
 }
 
 variable "ingress_tls_enabled" {
-  description = "Увімкнути TLS для Ingress"
+  description = "Enable TLS for the Ingress"
   type        = bool
   default     = true
 }
 
 variable "ingress_tls_secret_name" {
-  description = "Назва secret для TLS сертифіката"
+  description = "Name of the secret with the TLS certificate"
   type        = string
   default     = "jenkins-tls"
 }
 
 # Plugins
 variable "install_plugins" {
-  description = "Список плагінів для встановлення в Jenkins"
+  description = "List of plugins to install in Jenkins"
   type        = list(string)
   default = [
     "kubernetes:4029.v5712230ccb_f8",
@@ -240,129 +240,129 @@ variable "install_plugins" {
   ]
 }
 
-# AWS інтеграція
+# AWS integration
 variable "aws_region" {
-  description = "AWS регіон для інтеграції"
+  description = "AWS region for the integration"
   type        = string
   default     = ""
 }
 
 variable "ecr_registry_url" {
-  description = "URL ECR registry для Docker builds"
+  description = "ECR registry URL for Docker builds"
   type        = string
   default     = ""
 }
 
 # Auto Scaling
 variable "enable_hpa" {
-  description = "Увімкнути HorizontalPodAutoscaler"
+  description = "Enable HorizontalPodAutoscaler"
   type        = bool
   default     = false
 }
 
 variable "hpa_min_replicas" {
-  description = "Мінімальна кількість реплік для HPA"
+  description = "Minimum number of replicas for HPA"
   type        = number
   default     = 1
 
   validation {
     condition     = var.hpa_min_replicas >= 1
-    error_message = "Мінімальна кількість реплік повинна бути мінімум 1."
+    error_message = "Minimum replicas must be at least 1."
   }
 }
 
 variable "hpa_max_replicas" {
-  description = "Максимальна кількість реплік для HPA"
+  description = "Maximum number of replicas for HPA"
   type        = number
   default     = 3
 
   validation {
     condition     = var.hpa_max_replicas >= 1
-    error_message = "Максимальна кількість реплік повинна бути мінімум 1."
+    error_message = "Maximum replicas must be at least 1."
   }
 }
 
 variable "hpa_target_cpu_utilization" {
-  description = "Цільова утилізація CPU для HPA (%)"
+  description = "Target CPU utilization for HPA (%)"
   type        = number
   default     = 70
 
   validation {
     condition     = var.hpa_target_cpu_utilization >= 1 && var.hpa_target_cpu_utilization <= 100
-    error_message = "Цільова утилізація CPU повинна бути від 1% до 100%."
+    error_message = "Target CPU utilization must be between 1% and 100%."
   }
 }
 
 variable "hpa_target_memory_utilization" {
-  description = "Цільова утилізація пам'яті для HPA (%)"
+  description = "Target memory utilization for HPA (%)"
   type        = number
   default     = 80
 
   validation {
     condition     = var.hpa_target_memory_utilization >= 1 && var.hpa_target_memory_utilization <= 100
-    error_message = "Цільова утилізація пам'яті повинна бути від 1% до 100%."
+    error_message = "Target memory utilization must be between 1% and 100%."
   }
 }
 
-# Безпека
+# Security
 variable "security_context_enabled" {
-  description = "Увімкнути security context для Jenkins"
+  description = "Enable a security context for Jenkins"
   type        = bool
   default     = true
 }
 
 variable "pod_security_policy_enabled" {
-  description = "Увімкнути Pod Security Policy"
+  description = "Enable Pod Security Policy"
   type        = bool
   default     = false
 }
 
 variable "network_policy_enabled" {
-  description = "Увімкнути Network Policy для Jenkins"
+  description = "Enable a Network Policy for Jenkins"
   type        = bool
   default     = false
 }
 
-# Моніторинг
+# Monitoring
 variable "enable_prometheus_monitoring" {
-  description = "Увімкнути Prometheus моніторинг"
+  description = "Enable Prometheus monitoring"
   type        = bool
   default     = true
 }
 
 variable "prometheus_scrape_interval" {
-  description = "Інтервал збору метрик Prometheus"
+  description = "Prometheus scrape interval"
   type        = string
   default     = "30s"
 }
 
 # Backup
 variable "enable_backup" {
-  description = "Увімкнути автоматичне резервне копіювання"
+  description = "Enable automatic backups"
   type        = bool
   default     = false
 }
 
 variable "backup_schedule" {
-  description = "Cron розклад для резервного копіювання"
+  description = "Cron schedule for backups"
   type        = string
   default     = "0 2 * * *"
 }
 
 variable "backup_retention_days" {
-  description = "Кількість днів зберігання резервних копій"
+  description = "Number of days to keep backups"
   type        = number
   default     = 30
 
   validation {
     condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
-    error_message = "Період зберігання резервних копій повинен бути від 1 до 365 днів."
+    error_message = "Backup retention must be between 1 and 365 days."
   }
 }
 
-# Теги
+# Tags
 variable "tags" {
-  description = "Теги для ресурсів"
+  description = "Tags for resources"
   type        = map(string)
   default = {
     ManagedBy = "terraform"
@@ -370,45 +370,45 @@ variable "tags" {
   }
 }
 
-# Додаткові налаштування
+# Extra settings
 variable "timezone" {
-  description = "Часовий пояс для Jenkins"
+  description = "Time zone for Jenkins"
   type        = string
   default     = "UTC"
 }
 
 variable "java_opts" {
-  description = "Додаткові Java опції для Jenkins"
+  description = "Extra Java options for Jenkins"
   type        = string
   default     = "-Xmx2g -Xms1g"
 }
 
 variable "jenkins_opts" {
-  description = "Додаткові Jenkins опції"
+  description = "Extra Jenkins options"
   type        = string
   default     = ""
 }
 
 variable "enable_csrf_protection" {
-  description = "Увімкнути CSRF захист"
+  description = "Enable CSRF protection"
   type        = bool
   default     = true
 }
 
 variable "enable_script_security" {
-  description = "Увімкнути script security"
+  description = "Enable script security"
   type        = bool
   default     = true
 }
 
 variable "agent_connection_timeout" {
-  description = "Timeout для підключення агентів (секунди)"
+  description = "Timeout for agent connections (seconds)"
   type        = number
   default     = 100
 
   validation {
     condition     = var.agent_connection_timeout >= 30 && var.agent_connection_timeout <= 300
-    error_message = "Timeout підключення агентів повинен бути від 30 до 300 секунд."
+    error_message = "Agent connection timeout must be between 30 and 300 seconds."
   }
 }
 # IRSA for Jenkins build agents

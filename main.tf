@@ -1,4 +1,4 @@
-# Головний файл для підключення модулів
+# Root file that wires the modules together
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -13,7 +13,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Модуль VPC
+# VPC module
 module "vpc" {
   source = "./modules/vpc"
 
@@ -25,27 +25,27 @@ module "vpc" {
   tags = var.common_tags
 }
 
-# Модуль RDS
+# RDS module
 module "rds" {
   source = "./modules/rds"
 
-  # Основні параметри
+  # Basic parameters
   use_aurora     = var.use_aurora
   engine         = var.db_engine
   engine_version = var.db_engine_version
   instance_class = var.db_instance_class
 
-  # Мережеві параметри
+  # Network parameters
   vpc_id              = module.vpc.vpc_id
   subnet_ids          = module.vpc.private_subnet_ids
   allowed_cidr_blocks = [var.vpc_cidr]
 
-  # Параметри БД
+  # Database parameters
   database_name = var.database_name
   username      = var.db_username
   password      = var.db_password
 
-  # Додаткові налаштування
+  # Extra settings
   multi_az                = var.multi_az
   backup_retention_period = var.backup_retention_period
   backup_window           = var.backup_window
@@ -54,15 +54,15 @@ module "rds" {
   tags = var.common_tags
 }
 
-# Модуль EKS
+# EKS module
 module "eks" {
   source = "./modules/eks"
 
-  # Основні параметри
+  # Basic parameters
   cluster_name       = var.eks_cluster_name
   kubernetes_version = var.kubernetes_version
 
-  # Мережеві параметри
+  # Network parameters
   vpc_id     = module.vpc.vpc_id
   subnet_ids = concat(module.vpc.private_subnet_ids, module.vpc.public_subnet_ids)
 
@@ -75,35 +75,35 @@ module "eks" {
   tags = var.common_tags
 }
 
-# Модуль ECR
+# ECR module
 module "ecr" {
   source = "./modules/ecr"
 
-  # Основні параметри
+  # Basic parameters
   repository_name      = var.ecr_repository_name
   image_tag_mutability = var.ecr_image_tag_mutability
 
-  # Сканування
+  # Scanning
   scan_on_push             = var.ecr_scan_on_push
   enable_registry_scanning = var.ecr_enable_registry_scanning
 
-  # Шифрування
+  # Encryption
   encryption_type = var.ecr_encryption_type
   kms_key         = var.ecr_kms_key
 
-  # Політика життєвого циклу
+  # Lifecycle policy
   enable_lifecycle_policy = var.ecr_enable_lifecycle_policy
   max_image_count         = var.ecr_max_image_count
   untagged_image_days     = var.ecr_untagged_image_days
 
-  # Міжакаунтний доступ
+  # Cross-account access
   enable_cross_account_access = var.ecr_enable_cross_account_access
   cross_account_arns          = var.ecr_cross_account_arns
 
   tags = var.common_tags
 }
 
-# Провайдери для Jenkins (потрібні для Helm та Kubernetes)
+# Providers for Jenkins (needed by Helm and Kubernetes)
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
@@ -142,32 +142,32 @@ provider "helm" {
   }
 }
 
-# Модуль Jenkins
+# Jenkins module
 module "jenkins" {
   source = "./modules/jenkins"
 
-  # Основні параметри
+  # Basic parameters
   release_name = var.jenkins_release_name
   namespace    = var.jenkins_namespace
 
-  # Helm налаштування
+  # Helm settings
   helm_chart_version = var.jenkins_helm_chart_version
   helm_timeout       = var.jenkins_helm_timeout
 
-  # Jenkins конфігурація
+  # Jenkins configuration
   admin_user     = var.jenkins_admin_user
   admin_password = var.jenkins_admin_password
 
-  # Ресурси
+  # Resources
   resources = var.jenkins_resources
 
-  # Сховище
+  # Storage
   persistence_enabled = var.jenkins_persistence_enabled
   storage_size        = var.jenkins_storage_size
   storage_class       = var.jenkins_storage_class
   create_pvc          = var.jenkins_create_pvc
 
-  # Мережеві налаштування
+  # Network settings
   service_type                 = var.jenkins_service_type
   create_load_balancer_service = var.jenkins_create_load_balancer_service
   load_balancer_annotations    = var.jenkins_load_balancer_annotations
@@ -185,7 +185,7 @@ module "jenkins" {
   # Plugins
   install_plugins = var.jenkins_install_plugins
 
-  # AWS інтеграція
+  # AWS integration
   aws_region         = var.aws_region
   ecr_registry_url   = module.ecr.repository_url
   ecr_repository_arn = module.ecr.repository_arn
@@ -201,7 +201,7 @@ module "jenkins" {
   hpa_target_cpu_utilization    = var.jenkins_hpa_target_cpu_utilization
   hpa_target_memory_utilization = var.jenkins_hpa_target_memory_utilization
 
-  # Моніторинг
+  # Monitoring
   enable_prometheus_monitoring = var.jenkins_enable_prometheus_monitoring
   prometheus_scrape_interval   = var.jenkins_prometheus_scrape_interval
 
@@ -210,7 +210,7 @@ module "jenkins" {
   backup_schedule       = var.jenkins_backup_schedule
   backup_retention_days = var.jenkins_backup_retention_days
 
-  # Додаткові налаштування
+  # Extra settings
   timezone                 = var.jenkins_timezone
   java_opts                = var.jenkins_java_opts
   jenkins_opts             = var.jenkins_jenkins_opts
@@ -226,22 +226,22 @@ module "jenkins" {
   ]
 }
 
-# Модуль Argo CD
+# Argo CD module
 module "argocd" {
   source = "./modules/argo_cd"
 
-  # Основні параметри
+  # Basic parameters
   release_name = var.argocd_release_name
   namespace    = var.argocd_namespace
 
-  # Helm налаштування
+  # Helm settings
   helm_chart_version = var.argocd_helm_chart_version
   helm_timeout       = var.argocd_helm_timeout
 
-  # Argo CD конфігурація
+  # Argo CD configuration
   admin_password = var.argocd_admin_password
 
-  # Ресурси
+  # Resources
   controller_resources  = var.argocd_controller_resources
   server_resources      = var.argocd_server_resources
   repo_server_resources = var.argocd_repo_server_resources
@@ -252,7 +252,7 @@ module "argocd" {
   server_replicas      = var.argocd_server_replicas
   repo_server_replicas = var.argocd_repo_server_replicas
 
-  # Мережеві налаштування
+  # Network settings
   service_type                 = var.argocd_service_type
   create_load_balancer_service = var.argocd_create_load_balancer_service
   load_balancer_annotations    = var.argocd_load_balancer_annotations
@@ -267,7 +267,7 @@ module "argocd" {
   ingress_tls_enabled     = var.argocd_ingress_tls_enabled
   ingress_tls_secret_name = var.argocd_ingress_tls_secret_name
 
-  # Функціональність
+  # Features
   enable_metrics        = var.argocd_enable_metrics
   enable_notifications  = var.argocd_enable_notifications
   enable_applicationset = var.argocd_enable_applicationset
@@ -280,7 +280,7 @@ module "argocd" {
   hpa_target_cpu_utilization    = var.argocd_hpa_target_cpu_utilization
   hpa_target_memory_utilization = var.argocd_hpa_target_memory_utilization
 
-  # Моніторинг
+  # Monitoring
   enable_prometheus_monitoring = var.argocd_enable_prometheus_monitoring
   prometheus_scrape_interval   = var.argocd_prometheus_scrape_interval
 
@@ -289,7 +289,7 @@ module "argocd" {
   backup_schedule       = var.argocd_backup_schedule
   backup_retention_days = var.argocd_backup_retention_days
 
-  # GitOps налаштування
+  # GitOps settings
   create_demo_application  = var.argocd_create_demo_application
   demo_app_repo_url        = var.argocd_demo_app_repo_url
   demo_app_target_revision = var.argocd_demo_app_target_revision
@@ -303,7 +303,7 @@ module "argocd" {
   app_project_admin_groups     = var.argocd_app_project_admin_groups
   app_project_developer_groups = var.argocd_app_project_developer_groups
 
-  # Додаткові налаштування
+  # Extra settings
   timezone          = var.argocd_timezone
   log_level         = var.argocd_log_level
   log_format        = var.argocd_log_format
@@ -323,14 +323,14 @@ module "argocd" {
   ]
 }
 
-# Модуль моніторингу (Prometheus + Grafana)
+# Monitoring module (Prometheus + Grafana)
 module "monitoring" {
   source = "./modules/monitoring"
 
-  # Креденшели
+  # Credentials
   grafana_admin_password = var.grafana_admin_password
 
-  # Ingress налаштування
+  # Ingress settings
   grafana_ingress_enabled  = var.grafana_ingress_enabled
   grafana_ingress_hostname = var.grafana_ingress_hostname
 
@@ -341,118 +341,118 @@ module "monitoring" {
   ]
 }
 
-# Змінні
+# Variables
 variable "aws_region" {
-  description = "AWS регіон"
+  description = "AWS region"
   type        = string
   default     = "us-west-2"
 }
 
 variable "vpc_cidr" {
-  description = "CIDR блок для VPC"
+  description = "CIDR block for the VPC"
   type        = string
   default     = "10.0.0.0/16"
 }
 
 variable "availability_zones" {
-  description = "Список зон доступності"
+  description = "List of availability zones"
   type        = list(string)
   default     = ["us-west-2a", "us-west-2b"]
 }
 
 variable "public_subnet_cidrs" {
-  description = "CIDR блоки для публічних підмереж"
+  description = "CIDR blocks for public subnets"
   type        = list(string)
   default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
 variable "private_subnet_cidrs" {
-  description = "CIDR блоки для приватних підмереж"
+  description = "CIDR blocks for private subnets"
   type        = list(string)
   default     = ["10.0.10.0/24", "10.0.20.0/24"]
 }
 
 variable "use_aurora" {
-  description = "Використовувати Aurora кластер замість звичайної RDS"
+  description = "Use an Aurora cluster instead of a regular RDS instance"
   type        = bool
   default     = false
 }
 
 variable "db_engine" {
-  description = "Движок бази даних"
+  description = "Database engine"
   type        = string
   default     = "postgres"
 }
 
 variable "db_engine_version" {
-  description = "Версія движка бази даних"
+  description = "Database engine version"
   type        = string
   default     = "15.4"
 }
 
 variable "db_instance_class" {
-  description = "Клас інстансу бази даних"
+  description = "Database instance class"
   type        = string
   default     = "db.t3.micro"
 }
 
 variable "database_name" {
-  description = "Назва бази даних"
+  description = "Database name"
   type        = string
   default     = "myapp"
 }
 
 variable "db_username" {
-  description = "Ім'я користувача бази даних"
+  description = "Database username"
   type        = string
   default     = "dbadmin"
 }
 
 variable "db_password" {
-  description = "Пароль бази даних"
+  description = "Database password"
   type        = string
   sensitive   = true
 }
 
 variable "multi_az" {
-  description = "Увімкнути Multi-AZ розгортання"
+  description = "Enable Multi-AZ deployment"
   type        = bool
   default     = false
 }
 
 variable "backup_retention_period" {
-  description = "Період зберігання бекапів (дні)"
+  description = "Backup retention period (days)"
   type        = number
   default     = 7
 }
 
 variable "backup_window" {
-  description = "Вікно для створення бекапів"
+  description = "Backup window"
   type        = string
   default     = "03:00-04:00"
 }
 
 variable "maintenance_window" {
-  description = "Вікно для обслуговування"
+  description = "Maintenance window"
   type        = string
   default     = "sun:04:00-sun:05:00"
 }
 
-# EKS змінні
+# EKS variables
 variable "eks_cluster_name" {
-  description = "Назва EKS кластера"
+  description = "EKS cluster name"
   type        = string
   default     = "my-eks-cluster"
 }
 
 variable "kubernetes_version" {
-  description = "Версія Kubernetes"
+  description = "Kubernetes version"
   type        = string
   default     = "1.35"
 }
 
 variable "node_groups" {
-  description = "Конфігурація node groups"
+  description = "Node groups configuration"
   type = list(object({
     name                       = string
     instance_types             = list(string)
@@ -492,117 +492,117 @@ variable "node_groups" {
 }
 
 variable "enable_ebs_csi_driver" {
-  description = "Увімкнути AWS EBS CSI Driver"
+  description = "Enable the AWS EBS CSI Driver"
   type        = bool
   default     = true
 }
 
-# ECR змінні
+# ECR variables
 variable "ecr_repository_name" {
-  description = "Назва ECR репозиторію"
+  description = "ECR repository name"
   type        = string
   default     = "my-app"
 }
 
 variable "ecr_image_tag_mutability" {
-  description = "Можливість змінювати теги образів"
+  description = "Image tag mutability"
   type        = string
   default     = "IMMUTABLE"
 }
 
 variable "ecr_scan_on_push" {
-  description = "Сканувати образи при завантаженні"
+  description = "Scan images on push"
   type        = bool
   default     = true
 }
 
 variable "ecr_enable_registry_scanning" {
-  description = "Увімкнути розширене сканування реєстру"
+  description = "Enable enhanced registry scanning"
   type        = bool
   default     = false
 }
 
 variable "ecr_encryption_type" {
-  description = "Тип шифрування ECR"
+  description = "ECR encryption type"
   type        = string
   default     = "KMS"
 }
 
 variable "ecr_kms_key" {
-  description = "ARN KMS ключа для шифрування ECR"
+  description = "KMS key ARN for ECR encryption"
   type        = string
   default     = null
 }
 
 variable "ecr_enable_lifecycle_policy" {
-  description = "Увімкнути політику життєвого циклу ECR"
+  description = "Enable the ECR lifecycle policy"
   type        = bool
   default     = true
 }
 
 variable "ecr_max_image_count" {
-  description = "Максимальна кількість образів для зберігання"
+  description = "Maximum number of images to keep"
   type        = number
   default     = 10
 }
 
 variable "ecr_untagged_image_days" {
-  description = "Кількість днів для зберігання образів без тегів"
+  description = "Days to keep untagged images"
   type        = number
   default     = 1
 }
 
 variable "ecr_enable_cross_account_access" {
-  description = "Увімкнути міжакаунтний доступ до ECR"
+  description = "Enable cross-account access to ECR"
   type        = bool
   default     = false
 }
 
 variable "ecr_cross_account_arns" {
-  description = "ARN акаунтів для міжакаунтного доступу"
+  description = "Account ARNs for cross-account access"
   type        = list(string)
   default     = []
 }
 
-# Jenkins змінні
+# Jenkins variables
 variable "jenkins_release_name" {
-  description = "Назва Helm release для Jenkins"
+  description = "Helm release name for Jenkins"
   type        = string
   default     = "jenkins"
 }
 
 variable "jenkins_namespace" {
-  description = "Kubernetes namespace для Jenkins"
+  description = "Kubernetes namespace for Jenkins"
   type        = string
   default     = "jenkins"
 }
 
 variable "jenkins_helm_chart_version" {
-  description = "Версія Helm chart для Jenkins"
+  description = "Helm chart version for Jenkins"
   type        = string
   default     = "4.8.3"
 }
 
 variable "jenkins_helm_timeout" {
-  description = "Timeout для Helm операцій"
+  description = "Timeout for Helm operations"
   type        = number
   default     = 600
 }
 
 variable "jenkins_admin_user" {
-  description = "Ім'я адміністратора Jenkins"
+  description = "Jenkins admin username"
   type        = string
   default     = "admin"
 }
 
 variable "jenkins_admin_password" {
-  description = "Пароль адміністратора Jenkins"
+  description = "Jenkins admin password"
   type        = string
   sensitive   = true
 }
 
 variable "jenkins_resources" {
-  description = "Ресурси для Jenkins controller"
+  description = "Resources for the Jenkins controller"
   type = object({
     requests = object({
       cpu    = string
@@ -626,43 +626,43 @@ variable "jenkins_resources" {
 }
 
 variable "jenkins_persistence_enabled" {
-  description = "Увімкнути persistent storage для Jenkins"
+  description = "Enable persistent storage for Jenkins"
   type        = bool
   default     = true
 }
 
 variable "jenkins_storage_size" {
-  description = "Розмір сховища для Jenkins"
+  description = "Storage size for Jenkins"
   type        = string
   default     = "20Gi"
 }
 
 variable "jenkins_storage_class" {
-  description = "Storage class для Jenkins"
+  description = "Storage class for Jenkins"
   type        = string
   default     = "gp3"
 }
 
 variable "jenkins_create_pvc" {
-  description = "Створити PVC для Jenkins"
+  description = "Create a PVC for Jenkins"
   type        = bool
   default     = true
 }
 
 variable "jenkins_service_type" {
-  description = "Тип Kubernetes service для Jenkins"
+  description = "Kubernetes service type for Jenkins"
   type        = string
   default     = "ClusterIP"
 }
 
 variable "jenkins_create_load_balancer_service" {
-  description = "Створити LoadBalancer service"
+  description = "Create a LoadBalancer service"
   type        = bool
   default     = false
 }
 
 variable "jenkins_load_balancer_annotations" {
-  description = "Анотації для LoadBalancer service"
+  description = "Annotations for the LoadBalancer service"
   type        = map(string)
   default = {
     "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
@@ -670,25 +670,25 @@ variable "jenkins_load_balancer_annotations" {
 }
 
 variable "jenkins_load_balancer_source_ranges" {
-  description = "CIDR блоки для LoadBalancer"
+  description = "CIDR blocks for the LoadBalancer"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
 variable "jenkins_ingress_enabled" {
-  description = "Увімкнути Ingress для Jenkins"
+  description = "Enable Ingress for Jenkins"
   type        = bool
   default     = true
 }
 
 variable "jenkins_create_custom_ingress" {
-  description = "Створити кастомний Ingress"
+  description = "Create a custom Ingress"
   type        = bool
   default     = false
 }
 
 variable "jenkins_ingress_hostname" {
-  description = "Hostname для Jenkins Ingress"
+  description = "Hostname for the Jenkins Ingress"
   type        = string
   default     = "jenkins.local"
 }
@@ -700,7 +700,7 @@ variable "jenkins_ingress_class_name" {
 }
 
 variable "jenkins_ingress_annotations" {
-  description = "Анотації для Ingress"
+  description = "Annotations for the Ingress"
   type        = map(string)
   default = {
     "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
@@ -708,19 +708,19 @@ variable "jenkins_ingress_annotations" {
 }
 
 variable "jenkins_ingress_tls_enabled" {
-  description = "Увімкнути TLS для Ingress"
+  description = "Enable TLS for the Ingress"
   type        = bool
   default     = true
 }
 
 variable "jenkins_ingress_tls_secret_name" {
-  description = "Назва TLS secret"
+  description = "TLS secret name"
   type        = string
   default     = "jenkins-tls"
 }
 
 variable "jenkins_install_plugins" {
-  description = "Список плагінів для Jenkins"
+  description = "List of plugins for Jenkins"
   type        = list(string)
   default = [
     "kubernetes:4029.v5712230ccb_f8",
@@ -735,133 +735,133 @@ variable "jenkins_install_plugins" {
 }
 
 variable "jenkins_enable_hpa" {
-  description = "Увімкнути HorizontalPodAutoscaler"
+  description = "Enable HorizontalPodAutoscaler"
   type        = bool
   default     = false
 }
 
 variable "jenkins_hpa_min_replicas" {
-  description = "Мінімальна кількість реплік HPA"
+  description = "Minimum number of HPA replicas"
   type        = number
   default     = 1
 }
 
 variable "jenkins_hpa_max_replicas" {
-  description = "Максимальна кількість реплік HPA"
+  description = "Maximum number of HPA replicas"
   type        = number
   default     = 3
 }
 
 variable "jenkins_hpa_target_cpu_utilization" {
-  description = "Цільова утилізація CPU для HPA"
+  description = "Target CPU utilization for HPA"
   type        = number
   default     = 70
 }
 
 variable "jenkins_hpa_target_memory_utilization" {
-  description = "Цільова утилізація пам'яті для HPA"
+  description = "Target memory utilization for HPA"
   type        = number
   default     = 80
 }
 
 variable "jenkins_enable_prometheus_monitoring" {
-  description = "Увімкнути Prometheus моніторинг"
+  description = "Enable Prometheus monitoring"
   type        = bool
   default     = true
 }
 
 variable "jenkins_prometheus_scrape_interval" {
-  description = "Інтервал збору метрик Prometheus"
+  description = "Prometheus scrape interval"
   type        = string
   default     = "30s"
 }
 
 variable "jenkins_enable_backup" {
-  description = "Увімкнути автоматичне резервне копіювання"
+  description = "Enable automatic backups"
   type        = bool
   default     = false
 }
 
 variable "jenkins_backup_schedule" {
-  description = "Cron розклад для резервного копіювання"
+  description = "Cron schedule for backups"
   type        = string
   default     = "0 2 * * *"
 }
 
 variable "jenkins_backup_retention_days" {
-  description = "Кількість днів зберігання резервних копій"
+  description = "Number of days to keep backups"
   type        = number
   default     = 30
 }
 
 variable "jenkins_timezone" {
-  description = "Часовий пояс для Jenkins"
+  description = "Time zone for Jenkins"
   type        = string
   default     = "UTC"
 }
 
 variable "jenkins_java_opts" {
-  description = "Java опції для Jenkins"
+  description = "Java options for Jenkins"
   type        = string
   default     = "-Xmx2g -Xms1g"
 }
 
 variable "jenkins_jenkins_opts" {
-  description = "Jenkins опції"
+  description = "Jenkins options"
   type        = string
   default     = ""
 }
 
 variable "jenkins_enable_csrf_protection" {
-  description = "Увімкнути CSRF захист"
+  description = "Enable CSRF protection"
   type        = bool
   default     = true
 }
 
 variable "jenkins_enable_script_security" {
-  description = "Увімкнути script security"
+  description = "Enable script security"
   type        = bool
   default     = true
 }
 
 variable "jenkins_agent_connection_timeout" {
-  description = "Timeout для підключення агентів"
+  description = "Timeout for agent connections"
   type        = number
   default     = 100
 }
 
 variable "argocd_release_name" {
-  description = "Назва Helm release для Argo CD"
+  description = "Helm release name for Argo CD"
   type        = string
   default     = "argocd"
 }
 
 variable "argocd_namespace" {
-  description = "Kubernetes namespace для Argo CD"
+  description = "Kubernetes namespace for Argo CD"
   type        = string
   default     = "argocd"
 }
 
 variable "argocd_helm_chart_version" {
-  description = "Версія Helm chart для Argo CD"
+  description = "Helm chart version for Argo CD"
   type        = string
   default     = "5.51.6"
 }
 
 variable "argocd_helm_timeout" {
-  description = "Timeout для Helm операцій"
+  description = "Timeout for Helm operations"
   type        = number
   default     = 600
 }
 
 variable "argocd_admin_password" {
-  description = "Пароль адміністратора Argo CD"
+  description = "Argo CD admin password"
   type        = string
   sensitive   = true
 }
 
 variable "argocd_controller_resources" {
-  description = "Ресурси для Argo CD Application Controller"
+  description = "Resources for the Argo CD Application Controller"
   type = object({
     requests = object({
       cpu    = string
@@ -885,7 +885,7 @@ variable "argocd_controller_resources" {
 }
 
 variable "argocd_server_resources" {
-  description = "Ресурси для Argo CD Server"
+  description = "Resources for the Argo CD Server"
   type = object({
     requests = object({
       cpu    = string
@@ -909,7 +909,7 @@ variable "argocd_server_resources" {
 }
 
 variable "argocd_repo_server_resources" {
-  description = "Ресурси для Argo CD Repo Server"
+  description = "Resources for the Argo CD Repo Server"
   type = object({
     requests = object({
       cpu    = string
@@ -933,43 +933,43 @@ variable "argocd_repo_server_resources" {
 }
 
 variable "argocd_enable_ha" {
-  description = "Увімкнути High Availability режим"
+  description = "Enable High Availability mode"
   type        = bool
   default     = false
 }
 
 variable "argocd_controller_replicas" {
-  description = "Кількість реплік Application Controller"
+  description = "Number of Application Controller replicas"
   type        = number
   default     = 1
 }
 
 variable "argocd_server_replicas" {
-  description = "Кількість реплік Server"
+  description = "Number of Server replicas"
   type        = number
   default     = 2
 }
 
 variable "argocd_repo_server_replicas" {
-  description = "Кількість реплік Repo Server"
+  description = "Number of Repo Server replicas"
   type        = number
   default     = 2
 }
 
 variable "argocd_service_type" {
-  description = "Тип Kubernetes service для Argo CD"
+  description = "Kubernetes service type for Argo CD"
   type        = string
   default     = "ClusterIP"
 }
 
 variable "argocd_create_load_balancer_service" {
-  description = "Створити LoadBalancer service"
+  description = "Create a LoadBalancer service"
   type        = bool
   default     = false
 }
 
 variable "argocd_load_balancer_annotations" {
-  description = "Анотації для LoadBalancer service"
+  description = "Annotations for the LoadBalancer service"
   type        = map(string)
   default = {
     "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
@@ -977,25 +977,25 @@ variable "argocd_load_balancer_annotations" {
 }
 
 variable "argocd_load_balancer_source_ranges" {
-  description = "CIDR блоки для LoadBalancer"
+  description = "CIDR blocks for the LoadBalancer"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
 variable "argocd_ingress_enabled" {
-  description = "Увімкнути Ingress для Argo CD"
+  description = "Enable Ingress for Argo CD"
   type        = bool
   default     = true
 }
 
 variable "argocd_create_custom_ingress" {
-  description = "Створити кастомний Ingress"
+  description = "Create a custom Ingress"
   type        = bool
   default     = false
 }
 
 variable "argocd_ingress_hostname" {
-  description = "Hostname для Argo CD Ingress"
+  description = "Hostname for the Argo CD Ingress"
   type        = string
   default     = "argocd.local"
 }
@@ -1007,7 +1007,7 @@ variable "argocd_ingress_class_name" {
 }
 
 variable "argocd_ingress_annotations" {
-  description = "Анотації для Ingress"
+  description = "Annotations for the Ingress"
   type        = map(string)
   default = {
     "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
@@ -1015,232 +1015,232 @@ variable "argocd_ingress_annotations" {
 }
 
 variable "argocd_ingress_tls_enabled" {
-  description = "Увімкнути TLS для Ingress"
+  description = "Enable TLS for the Ingress"
   type        = bool
   default     = true
 }
 
 variable "argocd_ingress_tls_secret_name" {
-  description = "Назва TLS secret"
+  description = "TLS secret name"
   type        = string
   default     = "argocd-tls"
 }
 
 variable "argocd_enable_metrics" {
-  description = "Увімкнути Prometheus метрики"
+  description = "Enable Prometheus metrics"
   type        = bool
   default     = true
 }
 
 variable "argocd_enable_notifications" {
-  description = "Увімкнути Argo CD Notifications"
+  description = "Enable Argo CD Notifications"
   type        = bool
   default     = true
 }
 
 variable "argocd_enable_applicationset" {
-  description = "Увімкнути ApplicationSet Controller"
+  description = "Enable ApplicationSet Controller"
   type        = bool
   default     = true
 }
 
 variable "argocd_enable_dex" {
-  description = "Увімкнути Dex для OIDC"
+  description = "Enable Dex for OIDC"
   type        = bool
   default     = false
 }
 
 variable "argocd_enable_hpa" {
-  description = "Увімкнути HorizontalPodAutoscaler"
+  description = "Enable HorizontalPodAutoscaler"
   type        = bool
   default     = false
 }
 
 variable "argocd_hpa_min_replicas" {
-  description = "Мінімальна кількість реплік HPA"
+  description = "Minimum number of HPA replicas"
   type        = number
   default     = 2
 }
 
 variable "argocd_hpa_max_replicas" {
-  description = "Максимальна кількість реплік HPA"
+  description = "Maximum number of HPA replicas"
   type        = number
   default     = 5
 }
 
 variable "argocd_hpa_target_cpu_utilization" {
-  description = "Цільова утилізація CPU для HPA"
+  description = "Target CPU utilization for HPA"
   type        = number
   default     = 70
 }
 
 variable "argocd_hpa_target_memory_utilization" {
-  description = "Цільова утилізація пам'яті для HPA"
+  description = "Target memory utilization for HPA"
   type        = number
   default     = 80
 }
 
 variable "argocd_enable_prometheus_monitoring" {
-  description = "Увімкнути Prometheus моніторинг"
+  description = "Enable Prometheus monitoring"
   type        = bool
   default     = true
 }
 
 variable "argocd_prometheus_scrape_interval" {
-  description = "Інтервал збору метрик Prometheus"
+  description = "Prometheus scrape interval"
   type        = string
   default     = "30s"
 }
 
 variable "argocd_enable_backup" {
-  description = "Увімкнути автоматичне резервне копіювання"
+  description = "Enable automatic backups"
   type        = bool
   default     = false
 }
 
 variable "argocd_backup_schedule" {
-  description = "Cron розклад для резервного копіювання"
+  description = "Cron schedule for backups"
   type        = string
   default     = "0 2 * * *"
 }
 
 variable "argocd_backup_retention_days" {
-  description = "Кількість днів зберігання резервних копій"
+  description = "Number of days to keep backups"
   type        = number
   default     = 30
 }
 
 variable "argocd_create_demo_application" {
-  description = "Створити демонстраційний Application"
+  description = "Create a demo Application"
   type        = bool
   default     = false
 }
 
 variable "argocd_demo_app_repo_url" {
-  description = "URL репозиторію для демо додатку"
+  description = "Repository URL for the demo app"
   type        = string
   default     = "https://github.com/argoproj/argocd-example-apps.git"
 }
 
 variable "argocd_demo_app_target_revision" {
-  description = "Target revision для демо додатку"
+  description = "Target revision for the demo app"
   type        = string
   default     = "HEAD"
 }
 
 variable "argocd_demo_app_path" {
-  description = "Шлях в репозиторії для демо додатку"
+  description = "Path in the repository for the demo app"
   type        = string
   default     = "guestbook"
 }
 
 variable "argocd_demo_app_namespace" {
-  description = "Namespace для демо додатку"
+  description = "Namespace for the demo app"
   type        = string
   default     = "default"
 }
 
 variable "argocd_create_app_project" {
-  description = "Створити AppProject"
+  description = "Create an AppProject"
   type        = bool
   default     = false
 }
 
 variable "argocd_app_project_name" {
-  description = "Назва AppProject"
+  description = "AppProject name"
   type        = string
   default     = "default"
 }
 
 variable "argocd_app_project_source_repos" {
-  description = "Дозволені source repositories"
+  description = "Allowed source repositories"
   type        = list(string)
   default     = ["*"]
 }
 
 variable "argocd_app_project_admin_groups" {
-  description = "OIDC групи з admin правами"
+  description = "OIDC groups with admin rights"
   type        = list(string)
   default     = []
 }
 
 variable "argocd_app_project_developer_groups" {
-  description = "OIDC групи з developer правами"
+  description = "OIDC groups with developer rights"
   type        = list(string)
   default     = []
 }
 
 variable "argocd_timezone" {
-  description = "Часовий пояс для Argo CD"
+  description = "Time zone for Argo CD"
   type        = string
   default     = "UTC"
 }
 
 variable "argocd_log_level" {
-  description = "Рівень логування"
+  description = "Log level"
   type        = string
   default     = "info"
 }
 
 variable "argocd_log_format" {
-  description = "Формат логування"
+  description = "Log format"
   type        = string
   default     = "text"
 }
 
 variable "argocd_sync_timeout" {
-  description = "Timeout для sync операцій"
+  description = "Timeout for sync operations"
   type        = number
   default     = 300
 }
 
 variable "argocd_self_heal_timeout" {
-  description = "Timeout для self-heal операцій"
+  description = "Timeout for self-heal operations"
   type        = number
   default     = 5
 }
 
 variable "argocd_enable_webhooks" {
-  description = "Увімкнути webhook підтримку"
+  description = "Enable webhook support"
   type        = bool
   default     = true
 }
 
 variable "argocd_webhook_github_secret" {
-  description = "Secret для GitHub webhooks"
+  description = "Secret for GitHub webhooks"
   type        = string
   default     = ""
   sensitive   = true
 }
 
 variable "argocd_webhook_gitlab_secret" {
-  description = "Secret для GitLab webhooks"
+  description = "Secret for GitLab webhooks"
   type        = string
   default     = ""
   sensitive   = true
 }
 
-# Моніторинг змінні
+# Monitoring variables
 variable "grafana_admin_password" {
-  description = "Пароль адміністратора Grafana"
+  description = "Grafana admin password"
   type        = string
   sensitive   = true
 }
 
 variable "grafana_ingress_enabled" {
-  description = "Увімкнути Ingress для Grafana"
+  description = "Enable Ingress for Grafana"
   type        = bool
   default     = false
 }
 
 variable "grafana_ingress_hostname" {
-  description = "Hostname для Grafana Ingress"
+  description = "Hostname for the Grafana Ingress"
   type        = string
   default     = "grafana.local"
 }
 
 variable "common_tags" {
-  description = "Загальні теги для всіх ресурсів"
+  description = "Common tags for all resources"
   type        = map(string)
   default = {
     Environment = "dev"

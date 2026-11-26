@@ -1,22 +1,22 @@
-# Спільні ресурси для RDS та Aurora
+# Shared resources for RDS and Aurora
 
-# Локальні змінні для визначення параметрів
+# Local values to work out parameters
 locals {
-  # Визначення движка для Aurora
+  # Engine selection for Aurora
   aurora_engine = var.use_aurora ? (
     var.engine == "postgres" ? "aurora-postgresql" :
     var.engine == "mysql" ? "aurora-mysql" :
     var.engine
   ) : var.engine
 
-  # Автоматичне визначення порту
+  # Pick the port automatically
   default_port = var.port != null ? var.port : (
     contains(["postgres", "aurora-postgresql"], local.aurora_engine) ? 5432 :
     contains(["mysql", "aurora-mysql", "mariadb"], local.aurora_engine) ? 3306 :
     5432
   )
 
-  # Автоматичне визначення версії движка
+  # Pick the engine version automatically
   default_engine_version = var.engine_version != "" ? var.engine_version : (
     local.aurora_engine == "aurora-postgresql" ? "15.4" :
     local.aurora_engine == "aurora-mysql" ? "8.0.mysql_aurora.3.04.0" :
@@ -26,7 +26,7 @@ locals {
     "15.4"
   )
 
-  # Базові параметри для різних движків
+  # Base parameters for each engine
   base_db_parameters = {
     postgres = {
       "rds.force_ssl" = {
@@ -100,13 +100,13 @@ locals {
     }
   }
 
-  # Об'єднання базових та кастомних параметрів
+  # Merge base and custom parameters
   final_db_parameters = merge(
     lookup(local.base_db_parameters, var.engine, {}),
     var.custom_db_parameters
   )
 
-  # CloudWatch logs для різних движків
+  # CloudWatch logs for each engine
   default_logs_exports = {
     postgres          = ["postgresql"]
     mysql             = ["error", "general", "slow-query"]
@@ -128,13 +128,13 @@ resource "aws_db_subnet_group" "main" {
   })
 }
 
-# Security Group для бази даних
+# Security group for the database
 resource "aws_security_group" "db" {
   name_prefix = "${var.tags.Project}-db-"
   description = "Database: inbound only from allowed sources, no outbound"
   vpc_id      = var.vpc_id
 
-  # Вхідні правила для CIDR блоків
+  # Inbound rules for CIDR blocks
   dynamic "ingress" {
     for_each = length(var.allowed_cidr_blocks) > 0 ? [1] : []
     content {
@@ -146,7 +146,7 @@ resource "aws_security_group" "db" {
     }
   }
 
-  # Вхідні правила для Security Groups
+  # Inbound rules for security groups
   dynamic "ingress" {
     for_each = var.allowed_security_groups
     content {
@@ -199,7 +199,7 @@ resource "aws_db_parameter_group" "main" {
   }
 }
 
-# Cluster Parameter Group для Aurora
+# Cluster parameter group for Aurora
 resource "aws_rds_cluster_parameter_group" "main" {
   count = var.use_aurora ? 1 : 0
 
@@ -227,7 +227,7 @@ resource "aws_rds_cluster_parameter_group" "main" {
   }
 }
 
-# IAM роль для Enhanced Monitoring
+# IAM role for Enhanced Monitoring
 resource "aws_iam_role" "rds_enhanced_monitoring" {
   count = var.monitoring_interval > 0 ? 1 : 0
 

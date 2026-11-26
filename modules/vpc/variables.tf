@@ -1,43 +1,43 @@
-# Змінні для VPC
+# VPC variables
 
 variable "vpc_cidr" {
-  description = "CIDR блок для VPC"
+  description = "CIDR block for the VPC"
   type        = string
   validation {
     condition     = can(cidrhost(var.vpc_cidr, 0))
-    error_message = "VPC CIDR повинен бути валідним CIDR блоком."
+    error_message = "VPC CIDR must be a valid CIDR block."
   }
 }
 
 variable "availability_zones" {
-  description = "Список зон доступності"
+  description = "List of availability zones"
   type        = list(string)
   validation {
     condition     = length(var.availability_zones) >= 2
-    error_message = "Потрібно мінімум 2 зони доступності."
+    error_message = "At least 2 availability zones are required."
   }
 }
 
 variable "public_subnet_cidrs" {
-  description = "CIDR блоки для публічних підмереж"
+  description = "CIDR blocks for public subnets"
   type        = list(string)
   validation {
     condition     = length(var.public_subnet_cidrs) >= 2
-    error_message = "Потрібно мінімум 2 публічні підмережі."
+    error_message = "At least 2 public subnets are required."
   }
 }
 
 variable "private_subnet_cidrs" {
-  description = "CIDR блоки для приватних підмереж"
+  description = "CIDR blocks for private subnets"
   type        = list(string)
   validation {
     condition     = length(var.private_subnet_cidrs) >= 2
-    error_message = "Потрібно мінімум 2 приватні підмережі."
+    error_message = "At least 2 private subnets are required."
   }
 }
 
 variable "tags" {
-  description = "Теги для ресурсів"
+  description = "Tags for resources"
   type        = map(string)
   default     = {}
 }

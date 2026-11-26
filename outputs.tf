@@ -1,128 +1,128 @@
-# Загальні виводи ресурсів
+# Common resource outputs
 
-# VPC виводи
+# VPC outputs
 output "vpc_id" {
   description = "ID VPC"
   value       = module.vpc.vpc_id
 }
 
 output "private_subnet_ids" {
-  description = "ID приватних підмереж"
+  description = "Private subnet IDs"
   value       = module.vpc.private_subnet_ids
 }
 
 output "public_subnet_ids" {
-  description = "ID публічних підмереж"
+  description = "Public subnet IDs"
   value       = module.vpc.public_subnet_ids
 }
 
-# RDS виводи
+# RDS outputs
 output "database_endpoint" {
-  description = "Endpoint бази даних"
+  description = "Database endpoint"
   value       = module.rds.endpoint
 }
 
 output "database_port" {
-  description = "Порт бази даних"
+  description = "Database port"
   value       = module.rds.port
 }
 
 output "database_name" {
-  description = "Назва бази даних"
+  description = "Database name"
   value       = module.rds.database_name
 }
 
 output "database_username" {
-  description = "Ім'я користувача бази даних"
+  description = "Database username"
   value       = module.rds.username
   sensitive   = true
 }
 
 output "security_group_id" {
-  description = "ID Security Group для бази даних"
+  description = "Security group ID for the database"
   value       = module.rds.security_group_id
 }
 
 output "subnet_group_name" {
-  description = "Назва DB Subnet Group"
+  description = "DB subnet group name"
   value       = module.rds.subnet_group_name
 }
 
 output "parameter_group_name" {
-  description = "Назва Parameter Group"
+  description = "Parameter group name"
   value       = module.rds.parameter_group_name
 }
 
-# EKS виводи
+# EKS outputs
 output "eks_cluster_id" {
-  description = "ID EKS кластера"
+  description = "EKS cluster ID"
   value       = module.eks.cluster_id
 }
 
 output "eks_cluster_endpoint" {
-  description = "Endpoint EKS кластера"
+  description = "EKS cluster endpoint"
   value       = module.eks.cluster_endpoint
 }
 
 output "eks_cluster_name" {
-  description = "Назва EKS кластера"
+  description = "EKS cluster name"
   value       = module.eks.cluster_name
 }
 
 output "kubectl_config_command" {
-  description = "Команда для налаштування kubectl"
+  description = "Command to configure kubectl"
   value       = module.eks.kubectl_config_command
 }
 
 output "cluster_security_group_id" {
-  description = "ID Security Group EKS кластера"
+  description = "EKS cluster security group ID"
   value       = module.eks.cluster_security_group_id
 }
 
 output "node_security_group_id" {
-  description = "ID Security Group для EKS node groups"
+  description = "Security group ID for EKS node groups"
   value       = module.eks.node_security_group_id
 }
 
-# ECR виводи
+# ECR outputs
 output "ecr_repository_url" {
-  description = "URL ECR репозиторію"
+  description = "ECR repository URL"
   value       = module.ecr.repository_url
 }
 
 output "ecr_repository_arn" {
-  description = "ARN ECR репозиторію"
+  description = "ECR repository ARN"
   value       = module.ecr.repository_arn
 }
 
 output "ecr_registry_id" {
-  description = "ID ECR реєстру"
+  description = "ECR registry ID"
   value       = module.ecr.registry_id
 }
 
 output "ecr_docker_push_commands" {
-  description = "Команди для завантаження образу в ECR"
+  description = "Commands to push an image to ECR"
   value       = module.ecr.docker_push_commands
 }
 
 output "ecr_login_command" {
-  description = "Команда для логіну в ECR"
+  description = "Command to log in to ECR"
   value       = module.ecr.ecr_login_command
 }
 
-# Jenkins виводи
+# Jenkins outputs
 output "jenkins_url" {
-  description = "URL для доступу до Jenkins"
+  description = "URL to access Jenkins"
   value       = module.jenkins.jenkins_url
 }
 
 output "jenkins_admin_user" {
-  description = "Ім'я адміністратора Jenkins"
+  description = "Jenkins admin username"
   value       = module.jenkins.jenkins_admin_user
 }
 
 output "jenkins_admin_password" {
-  description = "Пароль адміністратора Jenkins"
+  description = "Jenkins admin password"
   value       = module.jenkins.jenkins_admin_password
   sensitive   = true
 }
@@ -133,28 +133,28 @@ output "jenkins_namespace" {
 }
 
 output "kubectl_port_forward_command" {
-  description = "Команда для port-forward до Jenkins"
+  description = "Command to port-forward to Jenkins"
   value       = module.jenkins.kubectl_port_forward_command
 }
 
 output "jenkins_webhook_url" {
-  description = "URL для GitHub/GitLab webhooks"
+  description = "URL for GitHub/GitLab webhooks"
   value       = module.jenkins.jenkins_webhook_url
 }
 
 output "jenkins_api_url" {
-  description = "URL для Jenkins API"
+  description = "URL for the Jenkins API"
   value       = module.jenkins.jenkins_api_url
 }
 
-# Argo CD виводи
+# Argo CD outputs
 output "argocd_url" {
-  description = "URL для доступу до Argo CD"
+  description = "URL to access Argo CD"
   value       = module.argocd.argocd_url
 }
 
 output "argocd_admin_password" {
-  description = "Пароль адміністратора Argo CD"
+  description = "Argo CD admin password"
   value       = module.argocd.argocd_admin_password
   sensitive   = true
 }
@@ -165,45 +165,45 @@ output "argocd_namespace" {
 }
 
 output "argocd_cli_login_command" {
-  description = "Команда для логіну через Argo CD CLI"
+  description = "Command to log in with the Argo CD CLI"
   value       = module.argocd.argocd_cli_login_command
   sensitive   = true
 }
 
 output "argocd_webhook_urls" {
-  description = "URLs для Git webhooks"
+  description = "URLs for Git webhooks"
   value       = module.argocd.argocd_webhook_urls
 }
 
 output "argocd_api_url" {
-  description = "URL для Argo CD API"
+  description = "URL for the Argo CD API"
   value       = module.argocd.argocd_api_url
 }
 
-# Моніторинг виводи
+# Monitoring outputs
 output "prometheus_url" {
-  description = "URL для доступу до Prometheus"
-  value       = "http://localhost:9090 (використовуйте kubectl port-forward)"
+  description = "URL to access Prometheus"
+  value       = "http://localhost:9090 (use kubectl port-forward)"
 }
 
 output "grafana_url" {
-  description = "URL для доступу до Grafana"
-  value       = "http://localhost:3000 (використовуйте kubectl port-forward)"
+  description = "URL to access Grafana"
+  value       = "http://localhost:3000 (use kubectl port-forward)"
 }
 
 output "grafana_admin_password" {
-  description = "Пароль адміністратора Grafana"
+  description = "Grafana admin password"
   value       = var.grafana_admin_password
   sensitive   = true
 }
 
-# Команди для доступу до моніторингу
+# Commands to access monitoring
 output "prometheus_port_forward_command" {
-  description = "Команда для port-forward до Prometheus"
+  description = "Command to port-forward to Prometheus"
   value       = "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
 }
 
 output "grafana_port_forward_command" {
-  description = "Команда для port-forward до Grafana"
+  description = "Command to port-forward to Grafana"
   value       = "kubectl port-forward svc/prometheus-grafana 3000:80 -n monitoring"
 }

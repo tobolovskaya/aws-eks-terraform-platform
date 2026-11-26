@@ -79,7 +79,7 @@ DATABASES = {
         "NAME": os.environ.get("POSTGRES_DB", "mydb"),
         "USER": os.environ.get("POSTGRES_USER", "myuser"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "mypassword"),
-        "HOST": os.environ.get("POSTGRES_HOST", "db"),  # ім'я сервісу з compose
+        "HOST": os.environ.get("POSTGRES_HOST", "db"),  # service name from compose
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
     }
 }

@@ -1,10 +1,10 @@
-# Створення EKS кластера та node groups
+# Create the EKS cluster and node groups
 
-# Дані про поточний регіон та caller identity
+# Current region and caller identity
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
-# IAM роль для EKS кластера
+# IAM role for the EKS cluster
 resource "aws_iam_role" "cluster" {
   name = "${var.cluster_name}-cluster-role"
 
@@ -24,7 +24,7 @@ resource "aws_iam_role" "cluster" {
   tags = var.tags
 }
 
-# Прикріплення політик до ролі кластера
+# Attach policies to the cluster role
 resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.cluster.name
@@ -35,14 +35,14 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSVPCResourceControlle
   role       = aws_iam_role.cluster.name
 }
 
-# Security Group для EKS кластера
+# Security group for the EKS cluster
 resource "aws_security_group" "cluster" {
   #checkov:skip=CKV_AWS_382: control plane needs outbound HTTPS to AWS APIs; traffic leaves via NAT, no inbound from internet
   name_prefix = "${var.cluster_name}-cluster-"
   description = "EKS control plane security group"
   vpc_id      = var.vpc_id
 
-  # Вихідний трафік
+  # Outbound traffic
   egress {
     description = "Outbound traffic to AWS APIs, ECR and the internet via NAT"
     from_port   = 0
@@ -60,7 +60,7 @@ resource "aws_security_group" "cluster" {
   }
 }
 
-# Додаткові правила для Security Group кластера
+# Extra rules for the cluster security group
 resource "aws_security_group_rule" "cluster_ingress_workstation_https" {
   count = length(var.allowed_cidr_blocks) > 0 ? 1 : 0
 
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "cluster_ingress_workstation_https" {
   type              = "ingress"
 }
 
-# EKS кластер
+# EKS cluster
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   role_arn = aws_iam_role.cluster.arn
@@ -87,10 +87,10 @@ resource "aws_eks_cluster" "main" {
     public_access_cidrs     = var.endpoint_public_access ? var.endpoint_public_access_cidrs : null
   }
 
-  # Увімкнення логування
+  # Enable logging
   enabled_cluster_log_types = var.cluster_log_types
 
-  # Шифрування секретів
+  # Secrets encryption
   encryption_config {
     provider {
       key_arn = local.create_kms_key ? aws_kms_key.eks_secrets[0].arn : var.cluster_encryption_config_kms_key_id
@@ -106,7 +106,7 @@ resource "aws_eks_cluster" "main" {
   ]
 }
 
-# IAM роль для node groups
+# IAM role for node groups
 resource "aws_iam_role" "node_group" {
   name = "${var.cluster_name}-node-group-role"
 
@@ -126,7 +126,7 @@ resource "aws_iam_role" "node_group" {
   tags = var.tags
 }
 
-# Прикріплення політик до ролі node group
+# Attach policies to the node group role
 resource "aws_iam_role_policy_attachment" "node_group_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.node_group.name
@@ -145,7 +145,7 @@ resource "aws_iam_role_policy_attachment" "node_group_AmazonEC2ContainerRegistry
 # EBS CSI Driver gets its own IAM role via IRSA (aws_ebs_csi_driver.tf),
 # so the node role does not need AmazonEBSCSIDriverPolicy (least privilege).
 
-# Launch template для node groups
+# Launch template for node groups
 resource "aws_launch_template" "node_group" {
   count = length(var.node_groups)
 
@@ -153,7 +153,7 @@ resource "aws_launch_template" "node_group" {
 
   vpc_security_group_ids = [aws_security_group.node_group.id]
 
-  # Налаштування блокових пристроїв
+  # Block device settings
   dynamic "block_device_mappings" {
     for_each = var.node_groups[count.index].disk_size > 0 ? [1] : []
     content {
@@ -167,7 +167,7 @@ resource "aws_launch_template" "node_group" {
     }
   }
 
-  # Метадані інстансу
+  # Instance metadata
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required"
@@ -181,14 +181,14 @@ resource "aws_launch_template" "node_group" {
   }
 }
 
-# Security Group для node groups
+# Security group for node groups
 resource "aws_security_group" "node_group" {
   #checkov:skip=CKV_AWS_382: nodes pull images and call AWS APIs via NAT; VPC endpoints for every service would replace this but cost more
   name_prefix = "${var.cluster_name}-node-group-"
   description = "EKS worker nodes security group"
   vpc_id      = var.vpc_id
 
-  # Вихідний трафік
+  # Outbound traffic
   egress {
     description = "Outbound traffic to AWS APIs, ECR and the internet via NAT"
     from_port   = 0
@@ -206,7 +206,7 @@ resource "aws_security_group" "node_group" {
   }
 }
 
-# Правила для Security Group node groups
+# Rules for the node group security group
 resource "aws_security_group_rule" "node_group_ingress_self" {
   description              = "Allow node to communicate with each other"
   from_port                = 0
@@ -246,19 +246,19 @@ resource "aws_eks_node_group" "main" {
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = var.node_groups[count.index].subnet_ids
 
-  # Налаштування інстансів
+  # Instance settings
   instance_types = var.node_groups[count.index].instance_types
   ami_type       = var.node_groups[count.index].ami_type
   capacity_type  = var.node_groups[count.index].capacity_type
 
-  # Масштабування
+  # Scaling
   scaling_config {
     desired_size = var.node_groups[count.index].desired_size
     max_size     = var.node_groups[count.index].max_size
     min_size     = var.node_groups[count.index].min_size
   }
 
-  # Налаштування оновлень
+  # Update settings
   update_config {
     max_unavailable_percentage = var.node_groups[count.index].max_unavailable_percentage
   }
@@ -297,7 +297,7 @@ resource "aws_eks_node_group" "main" {
   }
 }
 
-# OIDC Identity Provider для EKS
+# OIDC identity provider for EKS
 data "tls_certificate" "cluster" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
