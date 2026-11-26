@@ -59,7 +59,7 @@ flowchart LR
 
 ## Security hardening log
 
-Checkov findings went from **33 to 25**. Each fix is its own pull request:
+Checkov findings went from **33 to 0**: 18 fixed in code, 15 skipped with a written reason next to the resource. The Checkov job in CI is now **blocking**. Each step is its own pull request:
 
 | PR | Change | Why | Checkov |
 |---|---|---|---|
@@ -70,6 +70,9 @@ Checkov findings went from **33 to 25**. Each fix is its own pull request:
 | [#12](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/12) | Kubernetes 1.28 → 1.35, AL2023 nodes, custom `user_data` removed | Unsupported version; the node script piped `curl` into `bash` and added SSH keys | CKV_AWS_339 |
 | [#13](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/13) | IMDS hop limit 1, EBS CSI policy removed from node role | Pods can no longer read instance metadata and steal node credentials | CKV_AWS_341 |
 | [#14](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/14) | IRSA role for Jenkins agents | Build agents can push to one ECR repository, nothing else | |
+| [#16](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/16) | Jenkins builds images with Kaniko, `docker.sock` removed | A mounted Docker socket gives a build root on the node | |
+| [#17](https://github.com/tobolovskaya/aws-eks-terraform-platform/pull/17) | Immutable, KMS-encrypted ECR; locked default SG; VPC flow logs; SG descriptions; no DB egress; KMS for state | Tags cannot be overwritten, traffic is logged for incident response, least privilege on the network | CKV_AWS_51, 136, 145, 23, 382, CKV2_AWS_11, 12, 61 |
+| #18 | Remaining findings skipped with reasons, CI scan blocking | Accepted risks are documented, not hidden; new findings now fail the build | 15 skips |
 
 Other defaults:
 
@@ -146,7 +149,7 @@ checkov -d . --framework terraform --compact --quiet
 
 - [x] `Django/Jenkinsfile`: no more `/var/run/docker.sock`; images are built with Kaniko and pushed to ECR through the IRSA role
 - [ ] Pin the `kubectl` and `helm` agent images to fixed versions
-- [ ] Fix or document (`#checkov:skip` with a reason) the remaining Checkov findings, then make the CI scan blocking
+- [x] Fix or document (`#checkov:skip` with a reason) the remaining Checkov findings, then make the CI scan blocking
 - [ ] Drop `ecr:BatchDeleteImage` from the optional cross-account ECR policy
 
 ## Hva jeg lærte / What I learned

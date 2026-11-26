@@ -22,6 +22,7 @@ resource "aws_internet_gateway" "main" {
 
 # Публічні підмережі
 resource "aws_subnet" "public" {
+  #checkov:skip=CKV_AWS_130: public subnets only host NAT gateways and load balancers, which need public IPs
   count = length(var.public_subnet_cidrs)
 
   vpc_id                  = aws_vpc.main.id

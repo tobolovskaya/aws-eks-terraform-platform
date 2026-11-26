@@ -1,6 +1,7 @@
 # Створення DynamoDB таблиці для блокування стану Terraform
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
+  #checkov:skip=CKV_AWS_119: lock table holds only lock IDs, no secrets; AWS-owned key encryption is enough
   name         = var.dynamodb_table_name
   billing_mode = var.dynamodb_billing_mode
   hash_key     = "LockID"

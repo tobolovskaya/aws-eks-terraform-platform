@@ -48,6 +48,7 @@ resource "kubernetes_service_account" "argocd" {
 
 # ClusterRole для Argo CD
 resource "kubernetes_cluster_role" "argocd" {
+  #checkov:skip=CKV_K8S_49: Argo CD must manage arbitrary resources across the cluster; wildcards are required by design
   metadata {
     name = "argocd-application-controller"
     labels = {

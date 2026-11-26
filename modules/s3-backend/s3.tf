@@ -2,6 +2,8 @@
 
 # S3 бакет для стану Terraform
 resource "aws_s3_bucket" "terraform_state" {
+  #checkov:skip=CKV2_AWS_62: no consumer for event notifications on the state bucket
+  #checkov:skip=CKV_AWS_144: versioning protects state; cross-region replication is out of scope for a single-region lab
   bucket = var.bucket_name
 
   tags = merge(var.tags, {
@@ -109,6 +111,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
 
 # Налаштування логування доступу (опціонально)
 resource "aws_s3_bucket" "access_logs" {
+  #checkov:skip=CKV2_AWS_62: log bucket, no consumer for event notifications
+  #checkov:skip=CKV_AWS_144: access logs are not replicated to another region in this lab
+  #checkov:skip=CKV_AWS_145: S3 server access logging only supports SSE-S3 on the target bucket, not SSE-KMS
   count  = var.enable_access_logging ? 1 : 0
   bucket = "${var.bucket_name}-access-logs"
 

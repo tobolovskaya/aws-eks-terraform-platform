@@ -1,6 +1,8 @@
 # Створення звичайної RDS бази даних
 
 resource "aws_db_instance" "main" {
+  #checkov:skip=CKV_AWS_157: Multi-AZ doubles the cost; lab default is single-AZ, set multi_az = true for production
+  #checkov:skip=CKV_AWS_354: Performance Insights is off by default; when enabled it uses the AWS-managed KMS key
   #checkov:skip=CKV2_AWS_69: TLS is enforced in the parameter group (rds.force_ssl / require_secure_transport, modules/rds/shared.tf). Checkov cannot resolve the dynamic parameter block.
   count = var.use_aurora ? 0 : 1
 
@@ -79,5 +81,6 @@ resource "aws_db_instance" "main" {
 
 # Дані про доступні зони
 data "aws_availability_zones" "available" {
+  #checkov:skip=CKV_AWS_394: only used to pick one AZ for a single-AZ lab database
   state = "available"
 }
