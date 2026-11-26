@@ -76,7 +76,7 @@ Checkov findings went from **33 to 0**: 18 fixed in code, 15 skipped with a writ
 | #21 | RDS master password managed by Secrets Manager (`manage_master_user_password`) | The password is generated and rotated by AWS and never appears in variables, plans or Terraform state | |
 | #23 | One Django folder; secret key, debug and database settings from environment variables; health and readiness endpoints | The image build referenced a missing folder, the secret key and `DEBUG = True` were hardcoded, and the Kubernetes probes pointed to URLs that did not exist | |
 | #24 | GitHub Actions pinned to commit SHAs (kept current by Dependabot), tflint in CI, 55 unused variables removed | A moved tag cannot change what CI runs. Variables such as `enable_csrf_protection` were accepted but did nothing, which gave a false sense of security | |
-| #25 | `terraform test` with mocked providers: private EKS API, KMS for secrets, IMDSv2 with hop limit 1, managed DB password, immutable ECR, locked default SG, flow logs | The hardening is now checked on every pull request without an AWS account: if a secure default is changed, CI fails | |
+| #25 | `terraform test` with mocked providers: private EKS API, KMS for secrets, IMDSv2 with hop limit 1, managed DB password, immutable ECR, locked default SG, flow logs | The hardening is now checked on every pull request without an AWS account: if a secure default is changed, CI fails. The first run found a real bug: node groups got an empty subnet list, so `apply` would have failed. They now fall back to the cluster subnets | |
 
 Other defaults:
 
