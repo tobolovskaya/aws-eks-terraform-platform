@@ -189,42 +189,6 @@ variable "remove_default_gp2_storage_class" {
 }
 
 # Extra add-ons
-variable "enable_vpc_cni_addon" {
-  description = "Enable the VPC CNI add-on"
-  type        = bool
-  default     = true
-}
-
-variable "vpc_cni_addon_version" {
-  description = "VPC CNI add-on version"
-  type        = string
-  default     = null
-}
-
-variable "enable_coredns_addon" {
-  description = "Enable the CoreDNS add-on"
-  type        = bool
-  default     = true
-}
-
-variable "coredns_addon_version" {
-  description = "CoreDNS add-on version"
-  type        = string
-  default     = null
-}
-
-variable "enable_kube_proxy_addon" {
-  description = "Enable the kube-proxy add-on"
-  type        = bool
-  default     = true
-}
-
-variable "kube_proxy_addon_version" {
-  description = "kube-proxy add-on version"
-  type        = string
-  default     = null
-}
-
 # Tags
 variable "tags" {
   description = "Tags for resources"

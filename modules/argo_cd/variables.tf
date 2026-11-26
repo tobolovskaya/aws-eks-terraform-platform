@@ -347,18 +347,6 @@ variable "enable_dex" {
 }
 
 # Git repository settings
-variable "git_repositories" {
-  description = "List of Git repositories for Argo CD"
-  type = list(object({
-    url      = string
-    name     = string
-    username = optional(string)
-    password = optional(string)
-    ssh_key  = optional(string)
-  }))
-  default = []
-}
-
 # Demo Application
 variable "create_demo_application" {
   description = "Create a demo Application"
@@ -422,31 +410,7 @@ variable "app_project_developer_groups" {
 }
 
 # RBAC
-variable "rbac_policy" {
-  description = "Custom RBAC policy for Argo CD"
-  type        = string
-  default     = ""
-}
-
-variable "rbac_scopes" {
-  description = "RBAC scopes for Argo CD"
-  type        = string
-  default     = "[groups]"
-}
-
 # Security
-variable "enable_insecure" {
-  description = "Enable insecure mode (development only)"
-  type        = bool
-  default     = false
-}
-
-variable "certificate_secret_name" {
-  description = "Name of the secret with the TLS certificate"
-  type        = string
-  default     = ""
-}
-
 # Monitoring
 variable "enable_prometheus_monitoring" {
   description = "Enable Prometheus monitoring"
@@ -454,93 +418,9 @@ variable "enable_prometheus_monitoring" {
   default     = true
 }
 
-variable "prometheus_scrape_interval" {
-  description = "Prometheus scrape interval"
-  type        = string
-  default     = "30s"
-}
-
 # Backup
-variable "enable_backup" {
-  description = "Enable automatic backups"
-  type        = bool
-  default     = false
-}
-
-variable "backup_schedule" {
-  description = "Cron schedule for backups"
-  type        = string
-  default     = "0 2 * * *"
-}
-
-variable "backup_retention_days" {
-  description = "Number of days to keep backups"
-  type        = number
-  default     = 30
-
-  validation {
-    condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
-    error_message = "Backup retention must be between 1 and 365 days."
-  }
-}
-
 # Tags
-variable "tags" {
-  description = "Tags for resources"
-  type        = map(string)
-  default = {
-    ManagedBy = "terraform"
-    Module    = "argo-cd"
-  }
-}
-
 # Extra settings
-variable "timezone" {
-  description = "Time zone for Argo CD"
-  type        = string
-  default     = "UTC"
-}
-
-variable "log_level" {
-  description = "Log level for Argo CD"
-  type        = string
-  default     = "info"
-
-  validation {
-    condition     = contains(["debug", "info", "warn", "error"], var.log_level)
-    error_message = "Log level must be one of: debug, info, warn, error."
-  }
-}
-
-variable "log_format" {
-  description = "Log format for Argo CD"
-  type        = string
-  default     = "text"
-
-  validation {
-    condition     = contains(["text", "json"], var.log_format)
-    error_message = "Log format must be text or json."
-  }
-}
-
-variable "server_extra_args" {
-  description = "Extra arguments for the Argo CD Server"
-  type        = list(string)
-  default     = []
-}
-
-variable "controller_extra_args" {
-  description = "Extra arguments for the Application Controller"
-  type        = list(string)
-  default     = []
-}
-
-variable "repo_server_extra_args" {
-  description = "Extra arguments for the Repo Server"
-  type        = list(string)
-  default     = []
-}
-
 # Webhook settings
 variable "enable_webhooks" {
   description = "Enable webhook support"
@@ -548,39 +428,4 @@ variable "enable_webhooks" {
   default     = true
 }
 
-variable "webhook_github_secret" {
-  description = "Secret for GitHub webhooks"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
-variable "webhook_gitlab_secret" {
-  description = "Secret for GitLab webhooks"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
 # Sync settings
-variable "sync_timeout" {
-  description = "Timeout for sync operations (seconds)"
-  type        = number
-  default     = 300
-
-  validation {
-    condition     = var.sync_timeout >= 60 && var.sync_timeout <= 3600
-    error_message = "Sync timeout must be between 60 and 3600 seconds."
-  }
-}
-
-variable "self_heal_timeout" {
-  description = "Timeout for self-heal operations (seconds)"
-  type        = number
-  default     = 5
-
-  validation {
-    condition     = var.self_heal_timeout >= 1 && var.self_heal_timeout <= 60
-    error_message = "Self-heal timeout must be between 1 and 60 seconds."
-  }
-}

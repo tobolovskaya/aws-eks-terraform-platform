@@ -143,8 +143,3 @@ variable "tags" {
 }
 
 # Extra settings
-variable "force_delete" {
-  description = "Force delete the repository even if it contains images"
-  type        = bool
-  default     = false
-}
